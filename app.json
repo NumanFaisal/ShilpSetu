@@ -1,0 +1,62 @@
+{
+  "expo": {
+    "name": "ShilpSetu AI",
+    "slug": "shilpsetu-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "shilpsetu",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF8F6"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.shilpsetu.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "ShilpSetu needs camera access to photograph your craft products.",
+        "NSMicrophoneUsageDescription": "ShilpSetu needs microphone access for voice-based product description.",
+        "NSPhotoLibraryUsageDescription": "ShilpSetu needs photo library access to select product images."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#FFF8F6"
+      },
+      "package": "com.shilpsetu.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow ShilpSetu to access your camera to photograph products."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow ShilpSetu to access your photos for product listings."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
