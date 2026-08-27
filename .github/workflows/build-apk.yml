@@ -1,27 +1,27 @@
-name: ShilpSetu AI APK Release
+name: ShilpSetu-AI-APKs
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, develop ]
   pull_request:
     branches: [ main, master ]
 
 jobs:
   build:
-    name: Build Android APK
+    name: ShilpSetu-AI-APKs
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      - name: Install Node Dependencies
+      - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
       - name: Setup Java JDK 17
@@ -29,21 +29,22 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'
 
-      - name: Generate Native Android Code (Expo Prebuild)
+      - name: Generate Native Android Project (Expo Prebuild)
         run: npx expo prebuild --platform android
 
       - name: Make Gradlew Executable
         run: chmod +x android/gradlew
 
-      - name: Build Android Release & Debug APKs
+      - name: ShilpSetu-AI-APKs
         run: |
           cd android
-          ./gradlew assembleRelease assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon
 
-      - name: Upload APK Artifacts
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ShilpSetu-AI-APKs
-          path: android/app/build/outputs/apk/**/*.apk
+          path: android/app/build/outputs/apk/release/*.apk
           retention-days: 7
