@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -17,11 +18,12 @@ import { useAppStore } from '../store/useAppStore';
 import { flushOfflineQueue } from '../services/api';
 import '../global.css';
 
-// Keep splash screen visible until fonts + state are ready
-SplashScreen.preventAutoHideAsync();
+// Safely prevent splash autohide without breaking if native module fails
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const { setIsOnline, setFontsLoaded, offlineQueue, clearOfflineQueue, loadPersistedState } = useAppStore();
+  const [appIsReady, setAppIsReady] = useState(false);
 
   const [fontsLoaded] = useFonts({
     Fraunces_400Regular,
@@ -31,16 +33,35 @@ export default function RootLayout() {
     Inter_600SemiBold,
   });
 
-  // Load persisted auth/language state
+  // Load persisted auth/language state & set fallback timeout for fonts
   useEffect(() => {
-    loadPersistedState();
+    async function prepare() {
+      try {
+        await loadPersistedState();
+      } catch (e) {
+        console.warn('Failed preparing app state:', e);
+      } finally {
+        setAppIsReady(true);
+      }
+    }
+    prepare();
+
+    // Fail-safe timer: guarantee app loads even if font network/decoding stalls
+    const fallbackTimer = setTimeout(() => {
+      setAppIsReady(true);
+      setFontsLoaded(true);
+      SplashScreen.hideAsync().catch(() => {});
+    }, 1000);
+
+    return () => clearTimeout(fallbackTimer);
   }, []);
 
-  // Font loading gate — hide splash when fonts are ready
+  // Hide splash screen when fonts are loaded
   useEffect(() => {
     if (fontsLoaded) {
       setFontsLoaded(true);
-      SplashScreen.hideAsync();
+      setAppIsReady(true);
+      SplashScreen.hideAsync().catch(() => {});
     }
   }, [fontsLoaded]);
 
@@ -60,8 +81,8 @@ export default function RootLayout() {
     return unsubscribe;
   }, [offlineQueue]);
 
-  if (!fontsLoaded) {
-    return null; // Splash screen remains visible
+  if (!appIsReady && !fontsLoaded) {
+    return <View style={{ flex: 1, backgroundColor: '#FFF8F6' }} />;
   }
 
   return (
