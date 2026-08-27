@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, GestureResponderEvent, Modal, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, GestureResponderEvent, Modal, Switch, Image } from 'react-native';
 import { router } from 'expo-router';
 import { ArrowLeft, Bell } from 'lucide-react-native';
 import { useAppStore } from '../../store/useAppStore';
@@ -82,9 +82,16 @@ export const Header: React.FC<HeaderProps> = ({
               {title}
             </Text>
           ) : (
-            <Text style={{ fontFamily: 'Fraunces_600SemiBold', fontSize: 18, color: '#B5502F' }}>
-              ShilpSetu
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Image
+                source={require('../../assets/icon.png')}
+                style={{ width: 24, height: 24, borderRadius: 6 }}
+                resizeMode="cover"
+              />
+              <Text style={{ fontFamily: 'Fraunces_600SemiBold', fontSize: 18, color: '#B5502F' }}>
+                ShilpSetu
+              </Text>
+            </View>
           )}
         </TouchableOpacity>
 

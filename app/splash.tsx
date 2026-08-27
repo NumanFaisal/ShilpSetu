@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { View, Text, Animated } from 'react-native';
+import { View, Text, Animated, Image } from 'react-native';
 import { router } from 'expo-router';
 
 export default function SplashScreen() {
@@ -35,15 +35,22 @@ export default function SplashScreen() {
         {/* Logo mark */}
         <View
           style={{
-            width: 80,
-            height: 80,
-            borderRadius: 20,
+            width: 90,
+            height: 90,
+            borderRadius: 24,
             backgroundColor: '#B5502F',
             alignItems: 'center',
             justifyContent: 'center',
+            overflow: 'hidden',
+            borderWidth: 2,
+            borderColor: '#E4D8C3',
           }}
         >
-          <Text style={{ fontSize: 40 }}>🧺</Text>
+          <Image
+            source={require('../assets/icon.png')}
+            style={{ width: 90, height: 90 }}
+            resizeMode="cover"
+          />
         </View>
 
         {/* Brand name */}

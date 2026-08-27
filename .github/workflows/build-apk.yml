@@ -36,14 +36,14 @@ jobs:
       - name: Make Gradlew Executable
         run: chmod +x android/gradlew
 
-      - name: Build Release APK
+      - name: Build Android Release & Debug APKs
         run: |
           cd android
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease assembleDebug --no-daemon
 
-      - name: Upload APK Artifact
+      - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ShilpSetu-AI-Release-APK
-          path: android/app/build/outputs/apk/release/*.apk
+          name: ShilpSetu-AI-APKs
+          path: android/app/build/outputs/apk/**/*.apk
           retention-days: 7
