@@ -1,0 +1,702 @@
+﻿Starting a Gradle Daemon, 7 busy and 1 incompatible and 16 stopped Daemons could not be reused, use --status for details
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:shared:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:shared:compileJava NO-SOURCE
+> Task :gradle-plugin:shared:processResources NO-SOURCE
+> Task :gradle-plugin:shared:classes UP-TO-DATE
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:processResources
+> Task :gradle-plugin:settings-plugin:processResources
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:compileKotlin FROM-CACHE
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:compileJava NO-SOURCE
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:processResources NO-SOURCE
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:classes UP-TO-DATE
+> Task :gradle-plugin:shared:jar
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:jar
+> Task :gradle-plugin:settings-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:settings-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:settings-plugin:classes
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:compileKotlin FROM-CACHE
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:compileJava NO-SOURCE
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:classes
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:jar
+> Task :gradle-plugin:settings-plugin:jar
+> Task :expo-module-gradle-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo-gradle-plugin:expo-autolinking-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo-module-gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :expo-module-gradle-plugin:processResources
+> Task :expo-gradle-plugin:expo-max-sdk-override-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:react-native-gradle-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:react-native-gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:react-native-gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :expo-gradle-plugin:expo-autolinking-plugin:compileKotlin FROM-CACHE
+> Task :expo-gradle-plugin:expo-autolinking-plugin:compileJava NO-SOURCE
+> Task :expo-gradle-plugin:expo-autolinking-plugin:pluginDescriptors UP-TO-DATE
+> Task :expo-gradle-plugin:expo-autolinking-plugin:processResources
+> Task :expo-gradle-plugin:expo-autolinking-plugin:classes
+> Task :gradle-plugin:react-native-gradle-plugin:processResources
+> Task :gradle-plugin:react-native-gradle-plugin:classes
+> Task :expo-gradle-plugin:expo-autolinking-plugin:jar
+> Task :gradle-plugin:react-native-gradle-plugin:jar
+> Task :expo-gradle-plugin:expo-max-sdk-override-plugin:compileKotlin FROM-CACHE
+> Task :expo-gradle-plugin:expo-max-sdk-override-plugin:compileJava NO-SOURCE
+> Task :expo-gradle-plugin:expo-max-sdk-override-plugin:pluginDescriptors UP-TO-DATE
+> Task :expo-gradle-plugin:expo-max-sdk-override-plugin:processResources
+> Task :expo-gradle-plugin:expo-max-sdk-override-plugin:classes
+> Task :expo-gradle-plugin:expo-max-sdk-override-plugin:jar
+> Task :expo-module-gradle-plugin:compileKotlin FROM-CACHE
+> Task :expo-module-gradle-plugin:compileJava NO-SOURCE
+> Task :expo-module-gradle-plugin:classes
+> Task :expo-module-gradle-plugin:jar
+
+> Configure project :
+[32m[ExpoRootProject][0m Using the following versions:
+  - buildTools:  [32m36.0.0[0m
+  - minSdk:      [32m24[0m
+  - compileSdk:  [32m36[0m
+  - targetSdk:   [32m36[0m
+  - ndk:         [32m26.1.10909125[0m
+  - kotlin:      [32m2.1.20[0m
+  - ksp:         [32m2.1.20-2.0.1[0m
+
+> Configure project :app
+ ??  [33mApplying gradle plugin[0m '[32mexpo-max-sdk-override-plugin[0m'
+  [expo-max-sdk-override-plugin] This plugin will find all permissions declared with `android:maxSdkVersion`. If there exists a declaration with the `android:maxSdkVersion` annotation and another one without, the plugin will remove the annotation from the final merged manifest. In order to see a log with the changes run a clean build of the app.
+android.packagingOptions.doNotStrip += [**/*.so] (1)
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+
+> Configure project :expo
+
+Using expo modules
+  - [32mexpo-log-box[0m (57.0.4)
+  - [32mexpo-constants[0m (57.0.15)
+
+> Configure project :react-native-worklets
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+
+> Configure project :expo-modules-core
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+Linking react-native-worklets native libs into expo-modules-core build tasks
+task ':react-native-worklets:mergeDebugNativeLibs'
+task ':react-native-worklets:mergeReleaseNativeLibs'
+
+> Configure project :expo
+  - [32mexpo-modules-core[0m (57.0.14)
+  - [33m[?][0m [32mexpo-dom-webview[0m (57.0.1)
+  - [33m[?][0m [32mexpo-ui[0m (57.0.14)
+  - [33m[?][0m [32mexpo-asset[0m (57.0.15)
+  - [33m[?][0m [32mexpo-av[0m (15.1.7)
+  - [33m[?][0m [32mexpo-camera[0m (57.0.4)
+  - [33m[?][0m [32mexpo-file-system[0m (57.0.6)
+  - [33m[?][0m [32mexpo-font[0m (57.0.1)
+  - [33m[?][0m [32mexpo-image-loader[0m (57.0.1)
+  - [33m[?][0m [32mexpo-image-picker[0m (57.0.14)
+  - [33m[?][0m [32mexpo-keep-awake[0m (57.0.1)
+  - [33m[?][0m [32mexpo-linking[0m (57.0.8)
+  - [33m[?][0m [32mexpo-router[0m (57.0.17)
+  - [33m[?][0m [32mexpo-splash-screen[0m (57.0.8)
+  - [33m[?][0m [32mexpo-status-bar[0m (57.0.1)
+  - [33m[?][0m [32mexpo-system-ui[0m (57.0.3)
+
+
+> Configure project :react-native-gesture-handler
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+
+> Configure project :react-native-reanimated
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+
+> Configure project :react-native-screens
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+WARNING: [CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+[CXX5106] NDK was located by using ndk.dir property. This method is deprecated and will be removed in a future release. Please delete ndk.dir from local.properties and set android.ndkVersion to [26.1.10909125] in all native modules in the project. https://developer.android.com/r/studio-ui/ndk-dir
+
+> Task :expo-log-box:preBuild UP-TO-DATE
+> Task :expo-modules-core:preBuild UP-TO-DATE
+> Task :react-native-masked-view_masked-view:preBuild UP-TO-DATE
+> Task :expo:generatePackagesList UP-TO-DATE
+> Task :app:generateAutolinkingNewArchitectureFiles UP-TO-DATE
+> Task :expo:preBuild UP-TO-DATE
+> Task :react-native-safe-area-context:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-gesture-handler:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :app:generateAutolinkingPackageList UP-TO-DATE
+> Task :app:generateCodegenSchemaFromJavaScript SKIPPED
+> Task :app:generateCodegenArtifactsFromSchema SKIPPED
+> Task :app:generateReactNativeEntryPoint UP-TO-DATE
+> Task :react-native-safe-area-context:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-safe-area-context:preBuild UP-TO-DATE
+> Task :react-native-gesture-handler:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-gesture-handler:preBuild UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo:preDebugBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-community_netinfo:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-screens:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :expo:writeDebugAarMetadata UP-TO-DATE
+> Task :expo-log-box:preDebugBuild UP-TO-DATE
+> Task :react-native-community_netinfo:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-community_netinfo:preBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preBuild UP-TO-DATE
+> Task :expo-modules-core:preDebugBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preDebugBuild UP-TO-DATE
+> Task :react-native-svg:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :expo-log-box:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-community_netinfo:preDebugBuild UP-TO-DATE
+> Task :react-native-screens:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-screens:preBuild UP-TO-DATE
+> Task :react-native-gesture-handler:preDebugBuild UP-TO-DATE
+> Task :react-native-reanimated:assertMinimalReactNativeVersionTask
+> Task :react-native-worklets:assertMinimalReactNativeVersionTask
+> Task :react-native-community_netinfo:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-masked-view_masked-view:preDebugBuild UP-TO-DATE
+> Task :expo-modules-core:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-safe-area-context:preDebugBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-screens:preDebugBuild UP-TO-DATE
+> Task :react-native-masked-view_masked-view:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-gesture-handler:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-worklets:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :expo:generateDebugResValues UP-TO-DATE
+> Task :expo-log-box:generateDebugResValues UP-TO-DATE
+> Task :react-native-screens:writeDebugAarMetadata UP-TO-DATE
+> Task :expo:generateDebugResources UP-TO-DATE
+> Task :react-native-safe-area-context:writeDebugAarMetadata UP-TO-DATE
+> Task :expo-modules-core:generateDebugResValues UP-TO-DATE
+> Task :expo-log-box:generateDebugResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateDebugResValues UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateDebugResources UP-TO-DATE
+> Task :expo-modules-core:generateDebugResources UP-TO-DATE
+> Task :react-native-worklets:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-svg:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-svg:preBuild UP-TO-DATE
+> Task :react-native-svg:preDebugBuild UP-TO-DATE
+> Task :expo:packageDebugResources UP-TO-DATE
+> Task :react-native-svg:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-community_netinfo:generateDebugResValues UP-TO-DATE
+> Task :react-native-gesture-handler:generateDebugResValues UP-TO-DATE
+> Task :react-native-async-storage_async-storage:packageDebugResources UP-TO-DATE
+> Task :expo-modules-core:packageDebugResources UP-TO-DATE
+> Task :expo-log-box:packageDebugResources UP-TO-DATE
+> Task :react-native-community_netinfo:generateDebugResources UP-TO-DATE
+> Task :react-native-gesture-handler:generateDebugResources UP-TO-DATE
+> Task :react-native-masked-view_masked-view:generateDebugResValues UP-TO-DATE
+> Task :react-native-screens:generateDebugResValues UP-TO-DATE
+> Task :react-native-safe-area-context:generateDebugResValues UP-TO-DATE
+> Task :react-native-masked-view_masked-view:generateDebugResources UP-TO-DATE
+> Task :react-native-community_netinfo:packageDebugResources UP-TO-DATE
+> Task :react-native-safe-area-context:generateDebugResources UP-TO-DATE
+> Task :react-native-gesture-handler:packageDebugResources UP-TO-DATE
+> Task :react-native-masked-view_masked-view:packageDebugResources UP-TO-DATE
+> Task :react-native-svg:generateDebugResValues UP-TO-DATE
+> Task :expo:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-worklets:prepareWorkletsHeadersForPrefabs UP-TO-DATE
+> Task :react-native-worklets:preBuild
+> Task :react-native-worklets:preDebugBuild
+> Task :react-native-svg:generateDebugResources UP-TO-DATE
+> Task :react-native-worklets:writeDebugAarMetadata UP-TO-DATE
+> Task :expo-log-box:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-safe-area-context:packageDebugResources UP-TO-DATE
+> Task :expo:processDebugManifest UP-TO-DATE
+> Task :react-native-worklets:generateDebugResValues UP-TO-DATE
+> Task :expo-modules-core:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-screens:generateDebugResources UP-TO-DATE
+> Task :react-native-svg:packageDebugResources UP-TO-DATE
+> Task :react-native-worklets:generateDebugResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:extractDeepLinksDebug UP-TO-DATE
+> Task :expo-log-box:processDebugManifest UP-TO-DATE
+> Task :react-native-community_netinfo:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-gesture-handler:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:processDebugManifest UP-TO-DATE
+> Task :react-native-community_netinfo:processDebugManifest UP-TO-DATE
+> Task :expo-modules-core:processDebugManifest UP-TO-DATE
+> Task :react-native-safe-area-context:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-masked-view_masked-view:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-worklets:packageDebugResources UP-TO-DATE
+> Task :react-native-svg:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-gesture-handler:processDebugManifest UP-TO-DATE
+> Task :react-native-safe-area-context:processDebugManifest UP-TO-DATE
+> Task :react-native-screens:packageDebugResources UP-TO-DATE
+> Task :expo-log-box:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-worklets:extractDeepLinksDebug UP-TO-DATE
+> Task :expo:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-screens:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-masked-view_masked-view:processDebugManifest UP-TO-DATE
+> Task :react-native-svg:processDebugManifest UP-TO-DATE
+> Task :react-native-reanimated:assertWorkletsVersionTask
+> Task :expo-modules-core:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-worklets:processDebugManifest UP-TO-DATE
+> Task :react-native-screens:processDebugManifest UP-TO-DATE
+> Task :react-native-reanimated:generateCodegenSchemaFromJavaScript UP-TO-DATE
+> Task :react-native-gesture-handler:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-community_netinfo:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-gesture-handler:parseDebugLocalResources UP-TO-DATE
+> Task :expo-modules-core:parseDebugLocalResources UP-TO-DATE
+> Task :expo-log-box:parseDebugLocalResources UP-TO-DATE
+> Task :expo:parseDebugLocalResources UP-TO-DATE
+> Task :react-native-reanimated:generateCodegenArtifactsFromSchema UP-TO-DATE
+> Task :react-native-gesture-handler:generateDebugRFile UP-TO-DATE
+> Task :expo-modules-core:generateDebugRFile UP-TO-DATE
+> Task :react-native-async-storage_async-storage:parseDebugLocalResources UP-TO-DATE
+> Task :react-native-community_netinfo:parseDebugLocalResources UP-TO-DATE
+> Task :react-native-safe-area-context:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-masked-view_masked-view:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-safe-area-context:parseDebugLocalResources UP-TO-DATE
+> Task :react-native-community_netinfo:generateDebugRFile UP-TO-DATE
+> Task :react-native-masked-view_masked-view:parseDebugLocalResources UP-TO-DATE
+> Task :expo-log-box:generateDebugRFile UP-TO-DATE
+> Task :expo:generateDebugRFile UP-TO-DATE
+> Task :react-native-svg:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateDebugRFile UP-TO-DATE
+> Task :expo:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-worklets:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-svg:parseDebugLocalResources UP-TO-DATE
+> Task :expo:generateDebugBuildConfig UP-TO-DATE
+> Task :expo-modules-core:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-safe-area-context:generateDebugRFile UP-TO-DATE
+> Task :expo-log-box:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-masked-view_masked-view:generateDebugRFile UP-TO-DATE
+> Task :react-native-worklets:parseDebugLocalResources UP-TO-DATE
+> Task :react-native-screens:compileDebugLibraryResources UP-TO-DATE
+> Task :expo:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-worklets:generateDebugRFile UP-TO-DATE
+> Task :react-native-svg:generateDebugRFile UP-TO-DATE
+> Task :react-native-worklets:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-screens:parseDebugLocalResources UP-TO-DATE
+> Task :react-native-worklets:generateDebugBuildConfig UP-TO-DATE
+> Task :react-native-community_netinfo:generateDebugBuildConfig UP-TO-DATE
+> Task :expo-log-box:generateDebugBuildConfig UP-TO-DATE
+> Task :react-native-async-storage_async-storage:generateDebugBuildConfig UP-TO-DATE
+> Task :expo-modules-core:generateDebugBuildConfig UP-TO-DATE
+> Task :expo-log-box:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-gesture-handler:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-screens:generateDebugRFile UP-TO-DATE
+> Task :react-native-community_netinfo:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-gesture-handler:generateDebugBuildConfig UP-TO-DATE
+> Task :expo-modules-core:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-gesture-handler:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-safe-area-context:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-masked-view_masked-view:generateDebugBuildConfig UP-TO-DATE
+> Task :react-native-svg:generateDebugBuildConfig UP-TO-DATE
+> Task :react-native-safe-area-context:generateDebugBuildConfig UP-TO-DATE
+> Task :react-native-masked-view_masked-view:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-svg:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-reanimated:prepareReanimatedHeadersForPrefabs UP-TO-DATE
+> Task :react-native-reanimated:preBuild
+> Task :react-native-reanimated:preDebugBuild
+> Task :react-native-reanimated:writeDebugAarMetadata UP-TO-DATE
+> Task :react-native-reanimated:generateDebugResValues UP-TO-DATE
+> Task :react-native-reanimated:generateDebugResources UP-TO-DATE
+> Task :react-native-reanimated:packageDebugResources UP-TO-DATE
+> Task :react-native-reanimated:extractDeepLinksDebug UP-TO-DATE
+
+> Task :expo-constants:createExpoConfig
+.\gradlew.bat : The NODE_ENV environment variable is required but was not specified. Ensure the project is bundled 
+with Expo CLI or NODE_ENV is set. Using only .env.local and .env
+At line:1 char:1
++ .\gradlew.bat app:assembleDebug -x lint -x test --build-cache -Preact ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (The NODE_ENV en....local and .env:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+> Task :react-native-reanimated:processDebugManifest UP-TO-DATE
+> Task :react-native-reanimated:compileDebugLibraryResources UP-TO-DATE
+> Task :react-native-reanimated:parseDebugLocalResources UP-TO-DATE
+> Task :react-native-reanimated:generateDebugRFile UP-TO-DATE
+> Task :react-native-reanimated:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-reanimated:generateDebugBuildConfig UP-TO-DATE
+> Task :react-native-reanimated:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-screens:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-screens:generateDebugBuildConfig UP-TO-DATE
+> Task :react-native-community_netinfo:compileDebugJavaWithJavac UP-TO-DATE
+> Task :react-native-community_netinfo:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :react-native-svg:compileDebugJavaWithJavac UP-TO-DATE
+> Task :react-native-masked-view_masked-view:compileDebugJavaWithJavac UP-TO-DATE
+> Task :react-native-async-storage_async-storage:compileDebugJavaWithJavac UP-TO-DATE
+> Task :expo:mergeDebugShaders UP-TO-DATE
+> Task :react-native-svg:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :expo:compileDebugShaders NO-SOURCE
+> Task :expo:generateDebugAssets UP-TO-DATE
+> Task :expo-log-box:mergeDebugShaders UP-TO-DATE
+> Task :expo-modules-core:mergeDebugShaders UP-TO-DATE
+> Task :expo-modules-core:compileDebugShaders NO-SOURCE
+> Task :expo-modules-core:generateDebugAssets UP-TO-DATE
+> Task :expo:mergeDebugAssets UP-TO-DATE
+> Task :expo-log-box:compileDebugShaders NO-SOURCE
+> Task :expo-log-box:generateDebugAssets UP-TO-DATE
+> Task :react-native-masked-view_masked-view:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeDebugShaders UP-TO-DATE
+> Task :expo-modules-core:mergeDebugAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:compileDebugShaders NO-SOURCE
+> Task :react-native-async-storage_async-storage:generateDebugAssets UP-TO-DATE
+> Task :expo-log-box:mergeDebugAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeDebugAssets UP-TO-DATE
+> Task :react-native-community_netinfo:mergeDebugShaders UP-TO-DATE
+> Task :react-native-gesture-handler:mergeDebugShaders UP-TO-DATE
+> Task :react-native-masked-view_masked-view:mergeDebugShaders UP-TO-DATE
+> Task :react-native-community_netinfo:compileDebugShaders NO-SOURCE
+> Task :react-native-masked-view_masked-view:compileDebugShaders NO-SOURCE
+> Task :react-native-reanimated:mergeDebugShaders UP-TO-DATE
+> Task :react-native-gesture-handler:compileDebugShaders NO-SOURCE
+> Task :react-native-community_netinfo:generateDebugAssets UP-TO-DATE
+> Task :react-native-masked-view_masked-view:generateDebugAssets UP-TO-DATE
+> Task :react-native-gesture-handler:generateDebugAssets UP-TO-DATE
+> Task :react-native-masked-view_masked-view:mergeDebugAssets UP-TO-DATE
+> Task :react-native-reanimated:compileDebugShaders NO-SOURCE
+> Task :react-native-reanimated:generateDebugAssets UP-TO-DATE
+> Task :react-native-community_netinfo:mergeDebugAssets UP-TO-DATE
+> Task :react-native-gesture-handler:mergeDebugAssets UP-TO-DATE
+> Task :react-native-svg:mergeDebugShaders UP-TO-DATE
+> Task :react-native-reanimated:mergeDebugAssets UP-TO-DATE
+> Task :react-native-svg:compileDebugShaders NO-SOURCE
+> Task :react-native-svg:generateDebugAssets UP-TO-DATE
+> Task :react-native-community_netinfo:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :react-native-svg:mergeDebugAssets UP-TO-DATE
+> Task :react-native-masked-view_masked-view:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :react-native-svg:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:processDebugJavaRes NO-SOURCE
+> Task :react-native-community_netinfo:processDebugJavaRes NO-SOURCE
+> Task :react-native-masked-view_masked-view:processDebugJavaRes NO-SOURCE
+> Task :react-native-svg:processDebugJavaRes NO-SOURCE
+> Task :react-native-masked-view_masked-view:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :react-native-community_netinfo:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :expo:mergeDebugJniLibFolders UP-TO-DATE
+> Task :expo:mergeDebugNativeLibs NO-SOURCE
+> Task :expo:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :expo-log-box:mergeDebugJniLibFolders UP-TO-DATE
+> Task :expo-log-box:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-log-box:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :expo-modules-core:mergeDebugJniLibFolders UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeDebugJniLibFolders UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-svg:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :react-native-async-storage_async-storage:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-community_netinfo:mergeDebugJniLibFolders UP-TO-DATE
+> Task :react-native-community_netinfo:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-community_netinfo:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-gesture-handler:mergeDebugJniLibFolders UP-TO-DATE
+> Task :react-native-masked-view_masked-view:mergeDebugJniLibFolders UP-TO-DATE
+> Task :react-native-masked-view_masked-view:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-masked-view_masked-view:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-svg:mergeDebugJniLibFolders UP-TO-DATE
+> Task :react-native-svg:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-svg:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-safe-area-context:compileDebugKotlin UP-TO-DATE
+> Task :react-native-worklets:compileDebugKotlin UP-TO-DATE
+> Task :react-native-safe-area-context:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-worklets:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-safe-area-context:compileDebugJavaWithJavac UP-TO-DATE
+> Task :react-native-safe-area-context:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :react-native-worklets:compileDebugJavaWithJavac UP-TO-DATE
+> Task :react-native-worklets:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :react-native-safe-area-context:mergeDebugShaders UP-TO-DATE
+> Task :react-native-safe-area-context:compileDebugShaders NO-SOURCE
+> Task :react-native-safe-area-context:generateDebugAssets UP-TO-DATE
+> Task :react-native-worklets:mergeDebugShaders UP-TO-DATE
+> Task :react-native-safe-area-context:mergeDebugAssets UP-TO-DATE
+> Task :react-native-worklets:compileDebugShaders NO-SOURCE
+> Task :react-native-worklets:generateDebugAssets UP-TO-DATE
+> Task :react-native-worklets:mergeDebugAssets UP-TO-DATE
+> Task :react-native-safe-area-context:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :react-native-worklets:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :react-native-safe-area-context:processDebugJavaRes UP-TO-DATE
+> Task :react-native-worklets:processDebugJavaRes UP-TO-DATE
+> Task :react-native-reanimated:mergeDebugJniLibFolders UP-TO-DATE
+> Task :react-native-worklets:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :react-native-safe-area-context:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :react-native-safe-area-context:mergeDebugJniLibFolders UP-TO-DATE
+> Task :react-native-safe-area-context:mergeDebugNativeLibs NO-SOURCE
+> Task :react-native-safe-area-context:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-screens:compileDebugKotlin UP-TO-DATE
+> Task :react-native-screens:javaPreCompileDebug UP-TO-DATE
+> Task :react-native-screens:compileDebugJavaWithJavac UP-TO-DATE
+> Task :react-native-reanimated:compileDebugKotlin UP-TO-DATE
+> Task :react-native-screens:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :react-native-screens:mergeDebugShaders UP-TO-DATE
+> Task :react-native-screens:compileDebugShaders NO-SOURCE
+> Task :react-native-screens:generateDebugAssets UP-TO-DATE
+> Task :react-native-screens:mergeDebugAssets UP-TO-DATE
+> Task :react-native-screens:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :react-native-reanimated:compileDebugJavaWithJavac UP-TO-DATE
+> Task :react-native-reanimated:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :react-native-screens:processDebugJavaRes UP-TO-DATE
+> Task :react-native-reanimated:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :react-native-reanimated:processDebugJavaRes UP-TO-DATE
+> Task :react-native-reanimated:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :react-native-screens:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :expo-constants:preBuild
+> Task :app:preBuild
+> Task :app:preDebugBuild
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :expo-constants:preDebugBuild
+> Task :expo-constants:writeDebugAarMetadata UP-TO-DATE
+> Task :app:checkDebugAarMetadata SKIPPED
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :expo-constants:generateDebugResValues UP-TO-DATE
+> Task :expo-constants:generateDebugResources UP-TO-DATE
+> Task :expo-constants:packageDebugResources UP-TO-DATE
+> Task :expo-constants:extractDeepLinksDebug UP-TO-DATE
+> Task :react-native-gesture-handler:compileDebugKotlin UP-TO-DATE
+> Task :expo-constants:processDebugManifest UP-TO-DATE
+> Task :expo-constants:compileDebugLibraryResources UP-TO-DATE
+> Task :expo-constants:parseDebugLocalResources UP-TO-DATE
+> Task :react-native-gesture-handler:compileDebugJavaWithJavac UP-TO-DATE
+> Task :expo-constants:generateDebugRFile UP-TO-DATE
+> Task :expo-constants:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-gesture-handler:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :expo-constants:generateDebugBuildConfig UP-TO-DATE
+> Task :react-native-gesture-handler:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :expo-constants:javaPreCompileDebug UP-TO-DATE
+> Task :expo-constants:mergeDebugShaders UP-TO-DATE
+> Task :expo-constants:compileDebugShaders NO-SOURCE
+> Task :expo-constants:generateDebugAssets UP-TO-DATE
+> Task :react-native-gesture-handler:processDebugJavaRes UP-TO-DATE
+> Task :react-native-gesture-handler:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :expo-constants:mergeDebugAssets UP-TO-DATE
+> Task :expo-constants:mergeDebugJniLibFolders UP-TO-DATE
+> Task :expo-constants:mergeDebugNativeLibs NO-SOURCE
+> Task :expo-constants:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :expo-modules-core:compileDebugKotlin UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :expo-modules-core:compileDebugJavaWithJavac UP-TO-DATE
+> Task :expo-modules-core:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :expo-modules-core:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :expo-modules-core:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :expo-modules-core:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :react-native-worklets:configureCMakeDebug[x86_64]
+> Task :expo-constants:compileDebugKotlin UP-TO-DATE
+> Task :expo-constants:compileDebugJavaWithJavac UP-TO-DATE
+> Task :expo-constants:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :expo-constants:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :expo-constants:processDebugJavaRes UP-TO-DATE
+> Task :expo-constants:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:expoDebugOverrideMaxSdkConflicts UP-TO-DATE
+> Task :expo-log-box:compileDebugKotlin UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :expo-log-box:compileDebugJavaWithJavac UP-TO-DATE
+> Task :expo-log-box:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :expo-log-box:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :expo-log-box:processDebugJavaRes UP-TO-DATE
+> Task :expo-log-box:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :react-native-screens:configureCMakeDebug[x86_64]
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :expo:compileDebugKotlin UP-TO-DATE
+> Task :expo:compileDebugJavaWithJavac UP-TO-DATE
+> Task :expo:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :expo:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :expo:processDebugJavaRes UP-TO-DATE
+> Task :expo:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+
+> Task :react-native-screens:configureCMakeDebug[x86_64]
+C/C++: CMake Warning:
+C/C++:   Manually-specified variables were not used by the project:
+C/C++:     ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES
+
+> Task :react-native-worklets:configureCMakeDebug[x86_64]
+C/C++: CMake Warning:
+C/C++:   Manually-specified variables were not used by the project:
+C/C++:     ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES
+
+> Task :react-native-screens:buildCMakeDebug[x86_64]
+> Task :react-native-worklets:buildCMakeDebug[x86_64][worklets]
+> Task :react-native-screens:mergeDebugJniLibFolders UP-TO-DATE
+> Task :react-native-screens:mergeDebugNativeLibs UP-TO-DATE
+> Task :react-native-screens:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :react-native-worklets:externalNativeBuildDebug
+> Task :react-native-worklets:generateJsonModelDebug
+> Task :react-native-worklets:prefabDebugConfigurePackage
+> Task :react-native-worklets:prefabDebugPackage UP-TO-DATE
+> Task :react-native-worklets:mergeDebugJniLibFolders UP-TO-DATE
+> Task :react-native-worklets:mergeDebugNativeLibs UP-TO-DATE
+> Task :react-native-worklets:copyDebugJniLibsProjectOnly UP-TO-DATE
+
+> Task :expo-modules-core:configureCMakeDebug[x86_64]
+C/C++: CMake Warning:
+C/C++:   Manually-specified variables were not used by the project:
+C/C++:     ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES
+
+> Task :react-native-reanimated:configureCMakeDebug[x86_64]
+C/C++: CMake Warning:
+C/C++:   Manually-specified variables were not used by the project:
+C/C++:     ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES
+
+> Task :react-native-reanimated:generateJsonModelDebug
+> Task :react-native-reanimated:prefabDebugConfigurePackage UP-TO-DATE
+> Task :expo-modules-core:buildCMakeDebug[x86_64] FAILED
+> Task :app:configureCMakeDebug[x86_64]
+> Task :react-native-reanimated:buildCMakeDebug[x86_64][reanimated]
+> Task :react-native-gesture-handler:configureCMakeDebug[x86_64]

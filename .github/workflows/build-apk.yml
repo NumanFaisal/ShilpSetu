@@ -2,13 +2,11 @@ name: ShilpSetu-AI-APKs
 
 on:
   push:
-    branches: [ main, master, develop ]
-  pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 jobs:
   build:
-    name: ShilpSetu-AI-APKs
+    name: ShilpSetu-AI-Release-APK
     runs-on: ubuntu-latest
 
     steps:
@@ -18,35 +16,59 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci
 
+      # 1. Generate the android directory first so gradle files exist
+      - name: Generate Native Android Project (Expo Prebuild)
+        run: npx expo prebuild --platform android --clean
+
+      # 2. Now setup Java and cache gradle files (which now exist)
       - name: Setup Java JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Generate Native Android Project (Expo Prebuild)
-        run: npx expo prebuild --platform android
+      # 3. Decode the keystore file from repository secrets into android/app/
+      - name: Decode Keystore File
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
 
       - name: Make Gradlew Executable
         run: chmod +x android/gradlew
 
+      # 4. Build signed Android Release APK
       - name: Build Android Release APK
         env:
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx4096m -XX:MaxMetaspaceSize=1024m'"
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError"
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           cd android
-          ./gradlew assembleRelease --no-daemon --stacktrace
+          ./gradlew assembleRelease \
+            --no-daemon \
+            --stacktrace \
+            -PMYAPP_RELEASE_STORE_FILE=release.keystore \
+            -PMYAPP_RELEASE_STORE_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
+            -PMYAPP_RELEASE_KEY_ALIAS="$ANDROID_KEY_ALIAS" \
+            -PMYAPP_RELEASE_KEY_PASSWORD="$ANDROID_KEY_PASSWORD" \
+            -x lint \
+            -x test
+
+      - name: Rename and Verify APK
+        run: |
+          mv android/app/build/outputs/apk/release/app-release.apk android/app/build/outputs/apk/release/ShilpSetu-AI-release.apk
+          ls -la android/app/build/outputs/apk/release/
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ShilpSetu-AI-APKs
-          path: android/app/build/outputs/apk/release/*.apk
-          retention-days: 7
+          name: ShilpSetu-AI-release-apk
+          path: android/app/build/outputs/apk/release/ShilpSetu-AI-release.apk
+          retention-days: 30
