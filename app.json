@@ -59,6 +59,14 @@
         {
           "photosPermission": "Allow ShilpSetu to access your photos for product listings."
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "ndkVersion": "27.1.12297006"
+          }
+        }
       ]
     ],
     "experiments": {

@@ -7,7 +7,7 @@ module.exports = function withGlobalExt(config) {
     const extBlock = `
 // [Global Ext config]
 ext {
-    ndkVersion = "26.1.10909125"
+    ndkVersion = "27.1.12297006"
 }
 
 task patchReactNative(type: Exec) {
