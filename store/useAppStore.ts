@@ -84,13 +84,24 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setUserRole: (role) => {
     set({ userRole: role, isAuthenticated: role !== null });
-    if (role) AsyncStorage.setItem('@shilpsetu_role', role);
+    if (role) {
+      AsyncStorage.setItem('@shilpsetu_role', role).catch((e) =>
+        console.error('Failed to save user role:', e)
+      );
+    }
   },
 
   setAuthToken: (token) => {
     set({ authToken: token });
-    if (token) AsyncStorage.setItem('@shilpsetu_token', token);
-    else AsyncStorage.removeItem('@shilpsetu_token');
+    if (token) {
+      AsyncStorage.setItem('@shilpsetu_token', token).catch((e) =>
+        console.error('Failed to save auth token:', e)
+      );
+    } else {
+      AsyncStorage.removeItem('@shilpsetu_token').catch((e) =>
+        console.error('Failed to remove auth token:', e)
+      );
+    }
   },
 
   setArtisan: (artisan) => set({ artisan }),
@@ -99,7 +110,9 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setSelectedLanguage: (lang) => {
     set({ selectedLanguage: lang });
-    AsyncStorage.setItem('@shilpsetu_lang', lang);
+    AsyncStorage.setItem('@shilpsetu_lang', lang).catch((e) =>
+      console.error('Failed to save language:', e)
+    );
   },
 
   setIsOnline: (online) => set({ isOnline: online }),
@@ -109,23 +122,39 @@ export const useAppStore = create<AppState>((set, get) => ({
   updateDraftProduct: (data) => {
     const updated = { ...get().draftProduct, ...data };
     set({ draftProduct: updated });
-    AsyncStorage.setItem('@shilpsetu_draft', JSON.stringify(updated));
+    try {
+      AsyncStorage.setItem('@shilpsetu_draft', JSON.stringify(updated)).catch((e) =>
+        console.error('Failed to save draft product:', e)
+      );
+    } catch (e) {
+      console.error('Failed to stringify draft product:', e);
+    }
   },
 
   clearDraftProduct: () => {
     set({ draftProduct: {} });
-    AsyncStorage.removeItem('@shilpsetu_draft');
+    AsyncStorage.removeItem('@shilpsetu_draft').catch((e) =>
+      console.error('Failed to clear draft product:', e)
+    );
   },
 
   addOfflineWrite: (write) => {
     const queue = [...get().offlineQueue, write];
     set({ offlineQueue: queue });
-    AsyncStorage.setItem('@shilpsetu_queue', JSON.stringify(queue));
+    try {
+      AsyncStorage.setItem('@shilpsetu_queue', JSON.stringify(queue)).catch((e) =>
+        console.error('Failed to save offline queue:', e)
+      );
+    } catch (e) {
+      console.error('Failed to stringify offline queue:', e);
+    }
   },
 
   clearOfflineQueue: () => {
     set({ offlineQueue: [] });
-    AsyncStorage.removeItem('@shilpsetu_queue');
+    AsyncStorage.removeItem('@shilpsetu_queue').catch((e) =>
+      console.error('Failed to clear offline queue:', e)
+    );
   },
 
   logout: () => {
@@ -137,7 +166,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       buyer: null,
       draftProduct: {},
     });
-    AsyncStorage.multiRemove(['@shilpsetu_role', '@shilpsetu_token']);
+    AsyncStorage.multiRemove(['@shilpsetu_role', '@shilpsetu_token']).catch((e) =>
+      console.error('Failed to clear credentials:', e)
+    );
   },
 
   toggleDebugFlag: (flag) => {
@@ -164,8 +195,22 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
       if (token[1]) updates.authToken = token[1];
       if (lang[1]) updates.selectedLanguage = lang[1];
-      if (draft[1]) updates.draftProduct = JSON.parse(draft[1]);
-      if (queue[1]) updates.offlineQueue = JSON.parse(queue[1]);
+      
+      if (draft[1]) {
+        try {
+          updates.draftProduct = JSON.parse(draft[1]);
+        } catch (e) {
+          console.warn('Failed to parse draft product JSON:', e);
+        }
+      }
+      
+      if (queue[1]) {
+        try {
+          updates.offlineQueue = JSON.parse(queue[1]);
+        } catch (e) {
+          console.warn('Failed to parse offline queue JSON:', e);
+        }
+      }
 
       set(updates);
     } catch (e) {

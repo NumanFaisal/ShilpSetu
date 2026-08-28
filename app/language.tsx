@@ -10,6 +10,9 @@ export default function LanguageScreen() {
   const { setSelectedLanguage } = useAppStore();
   const [selected, setSelected] = useState('en');
 
+
+  // nothing
+
   const handleContinue = () => {
     setSelectedLanguage(selected);
     router.replace('/welcome');
