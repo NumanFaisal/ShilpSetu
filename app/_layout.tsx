@@ -22,10 +22,17 @@ import '../global.css';
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
-  const { setIsOnline, setFontsLoaded, offlineQueue, clearOfflineQueue, loadPersistedState } = useAppStore();
+  const { 
+    setIsOnline, 
+    setFontsLoaded, 
+    offlineQueue, 
+    clearOfflineQueue, 
+    loadPersistedState,
+    isOnline 
+  } = useAppStore();
   const [appIsReady, setAppIsReady] = useState(false);
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontsError] = useFonts({
     Fraunces_400Regular,
     Fraunces_600SemiBold,
     Inter_400Regular,
@@ -33,55 +40,86 @@ export default function RootLayout() {
     Inter_600SemiBold,
   });
 
-  // Load persisted auth/language state & set fallback timeout for fonts
+  // 1. Load persisted auth/language state on mount
   useEffect(() => {
+    let isMounted = true;
     async function prepare() {
       try {
         await loadPersistedState();
       } catch (e) {
         console.warn('Failed preparing app state:', e);
       } finally {
-        setAppIsReady(true);
+        if (isMounted) {
+          setAppIsReady(true);
+        }
       }
     }
     prepare();
 
-    // Fail-safe timer: guarantee app loads even if font network/decoding stalls
-    const fallbackTimer = setTimeout(() => {
-      setAppIsReady(true);
-      setFontsLoaded(true);
-      SplashScreen.hideAsync().catch(() => {});
-    }, 1000);
-
-    return () => clearTimeout(fallbackTimer);
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Hide splash screen when fonts are loaded
+  // 2. Hide splash screen when fonts are loaded and app is ready
+  const fontsFinished = !!(fontsLoaded || fontsError);
+
   useEffect(() => {
-    if (fontsLoaded) {
+    if (fontsFinished && appIsReady) {
       setFontsLoaded(true);
-      setAppIsReady(true);
       SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded]);
+  }, [fontsFinished, appIsReady]);
 
-  // Network connectivity monitoring
+  // 3. Fail-safe timer: guarantee app loads even if font loading stalls
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      const online = state.isConnected ?? false;
-      setIsOnline(online);
+    if (appIsReady) {
+      const fallbackTimer = setTimeout(() => {
+        setFontsLoaded(true);
+        SplashScreen.hideAsync().catch(() => {});
+      }, 3000);
+      return () => clearTimeout(fallbackTimer);
+    }
+  }, [appIsReady]);
 
-      // Flush offline queue on reconnect
-      if (online && offlineQueue.length > 0) {
-        flushOfflineQueue(offlineQueue).then(() => {
-          clearOfflineQueue();
+  // 4. Network connectivity monitoring (Subscribe once on mount)
+  useEffect(() => {
+    if (!NetInfo || typeof NetInfo.addEventListener !== 'function') {
+      console.warn('NetInfo native module is not available');
+      return;
+    }
+
+    try {
+      const unsubscribe = NetInfo.addEventListener((state) => {
+        const online = state.isConnected ?? false;
+        setIsOnline(online);
+      });
+      return unsubscribe;
+    } catch (e) {
+      console.error('Failed to subscribe to NetInfo:', e);
+    }
+  }, []);
+
+  // 5. Flush offline queue on reconnect
+  useEffect(() => {
+    if (isOnline && offlineQueue.length > 0) {
+      let isCurrent = true;
+      flushOfflineQueue(offlineQueue)
+        .then(() => {
+          if (isCurrent) {
+            clearOfflineQueue();
+          }
+        })
+        .catch((err) => {
+          console.error('Failed flushing offline queue:', err);
         });
-      }
-    });
-    return unsubscribe;
-  }, [offlineQueue]);
+      return () => {
+        isCurrent = false;
+      };
+    }
+  }, [isOnline, offlineQueue]);
 
-  if (!appIsReady && !fontsLoaded) {
+  if (!appIsReady || (!fontsLoaded && !fontsError)) {
     return <View style={{ flex: 1, backgroundColor: '#FFF8F6' }} />;
   }
 
@@ -98,7 +136,7 @@ export default function RootLayout() {
         <Stack.Screen name="(artisan-flow)" />
         <Stack.Screen name="(buyer)" />
         <Stack.Screen name="bulk-request" />
-        <Stack.Screen name="chat/[threadId]" />
+        <Stack.Screen name="chat" />
         <Stack.Screen name="notifications" />
         <Stack.Screen name="settings" />
         <Stack.Screen name="help" />

@@ -22,6 +22,7 @@
         "backgroundColor": "#FFF8F6"
       },
       "package": "com.shilpsetu.app",
+      "versionCode": 1,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
@@ -34,6 +35,9 @@
       "bundler": "metro"
     },
     "plugins": [
+      "./scripts/withCpp20",
+      "./scripts/withAndroidSigning",
+      "./scripts/withGlobalExt",
       "expo-router",
       "expo-font",
       [
