@@ -121,7 +121,7 @@ function patchGradleTransformsCacheHeaders() {
     for (const version of versions) {
       if (!/^\d+\.\d+/.test(version)) continue;
       const majorVersion = parseInt(version.split('.')[0], 10);
-      if (majorVersion >= 9) continue;
+      if (majorVersion > 10) continue;
       const transformsDir = path.join(gradleCacheBase, version, 'transforms');
       if (!fs.existsSync(transformsDir)) continue;
 
@@ -316,6 +316,46 @@ class TransformOperationInterpolator : public StyleOperationInterpolator {
   }
 }
 
+// ─── Patch 5: react-native-screens CMakeLists.txt (c++_shared link fix for NDK 27) ───
+function patchScreensCMake() {
+  const nodeModulesDir = path.join(__dirname, '..', 'node_modules');
+  const cmakePath = path.join(nodeModulesDir, 'react-native-screens', 'android', 'CMakeLists.txt');
+  if (fs.existsSync(cmakePath)) {
+    let content = fs.readFileSync(cmakePath, 'utf8');
+    if (content.includes('fbjni::fbjni') && !content.includes('c++_shared')) {
+      content = content.replace(
+        /android\s*\)/,
+        'android\n    c++_shared\n)'
+      );
+      fs.writeFileSync(cmakePath, content, 'utf8');
+      console.log('[Patch] Added c++_shared link target to react-native-screens CMakeLists.txt');
+    } else {
+      console.log('[Patch] react-native-screens CMakeLists.txt already patched or target pattern not found.');
+    }
+  }
+}
+
+// ─── Patch 6: react-native-worklets CMakeLists.txt (c++_shared link fix for NDK 27) ───
+function patchWorkletsCMake() {
+  const nodeModulesDir = path.join(__dirname, '..', 'node_modules');
+  const cmakePath = path.join(nodeModulesDir, 'react-native-worklets', 'android', 'CMakeLists.txt');
+  if (fs.existsSync(cmakePath)) {
+    let content = fs.readFileSync(cmakePath, 'utf8');
+    if (content.includes('fbjni::fbjni') && !content.includes('c++_shared')) {
+      content = content.replace(
+        'fbjni::fbjni)',
+        'fbjni::fbjni c++_shared)'
+      );
+      fs.writeFileSync(cmakePath, content, 'utf8');
+      console.log('[Patch] Added c++_shared link target to react-native-worklets CMakeLists.txt');
+    } else {
+      console.log('[Patch] react-native-worklets CMakeLists.txt already patched or target pattern not found.');
+    }
+  }
+}
+
 patchReanimatedInterpolator();
+patchScreensCMake();
+patchWorkletsCMake();
 
 console.log('[Patch] Complete.');
