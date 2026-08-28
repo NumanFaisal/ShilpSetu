@@ -37,7 +37,15 @@ jobs:
       # 3. Decode the keystore file from repository secrets into android/app/
       - name: Decode Keystore File
         run: |
+          if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "ERROR: ANDROID_KEYSTORE_BASE64 secret is not configured!"
+            exit 1
+          fi
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
+          if [ ! -f android/app/release.keystore ]; then
+            echo "ERROR: Failed to decode release.keystore!"
+            exit 1
+          fi
 
       - name: Make Gradlew Executable
         run: chmod +x android/gradlew
@@ -46,25 +54,44 @@ jobs:
       - name: Build Android Release APK
         env:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError"
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ORG_GRADLE_PROJECT_MYAPP_RELEASE_STORE_FILE: "release.keystore"
+          ORG_GRADLE_PROJECT_MYAPP_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ORG_GRADLE_PROJECT_MYAPP_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ORG_GRADLE_PROJECT_MYAPP_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           cd android
-          ./gradlew assembleRelease \
-            --no-daemon \
-            --stacktrace \
-            -PMYAPP_RELEASE_STORE_FILE=release.keystore \
-            -PMYAPP_RELEASE_STORE_PASSWORD="$ANDROID_KEYSTORE_PASSWORD" \
-            -PMYAPP_RELEASE_KEY_ALIAS="$ANDROID_KEY_ALIAS" \
-            -PMYAPP_RELEASE_KEY_PASSWORD="$ANDROID_KEY_PASSWORD" \
-            -x lint \
-            -x test
+          ./gradlew assembleRelease --no-daemon --stacktrace -x lint -x test
 
-      - name: Rename and Verify APK
+      - name: Rename and Verify APK Signature & Release Flag
         run: |
-          mv android/app/build/outputs/apk/release/app-release.apk android/app/build/outputs/apk/release/ShilpSetu-AI-release.apk
-          ls -la android/app/build/outputs/apk/release/
+          APK_DIR="android/app/build/outputs/apk/release"
+          mv "$APK_DIR/app-release.apk" "$APK_DIR/ShilpSetu-AI-release.apk"
+          ls -la "$APK_DIR/"
+          
+          # Find apksigner and verify
+          apksigner_path=$(find $ANDROID_HOME/build-tools -name apksigner | head -n 1)
+          if [ -n "$apksigner_path" ]; then
+            echo "Verifying signature with apksigner at $apksigner_path..."
+            $apksigner_path verify --verbose "$APK_DIR/ShilpSetu-AI-release.apk"
+          else
+            echo "apksigner not found, trying jarsigner..."
+            jarsigner -verify -verbose -certs "$APK_DIR/ShilpSetu-AI-release.apk"
+          fi
+          
+          # Find aapt and verify it is not debuggable
+          aapt_path=$(find $ANDROID_HOME/build-tools -name aapt | head -n 1)
+          if [ -n "$aapt_path" ]; then
+            echo "Checking release properties with aapt at $aapt_path..."
+            $aapt_path dump badging "$APK_DIR/ShilpSetu-AI-release.apk" > badging.txt
+            if grep -q "application-debuggable" badging.txt; then
+              echo "ERROR: The generated APK contains 'application-debuggable' and is NOT a release build!"
+              exit 1
+            else
+              echo "SUCCESS: The generated APK is a valid RELEASE build (not debuggable)."
+            fi
+          else
+            echo "aapt not found, skipping badging dump."
+          fi
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
