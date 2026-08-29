@@ -354,8 +354,135 @@ function patchWorkletsCMake() {
   }
 }
 
+// ─── Patch 7: expo-modules-core common.cmake (c++_shared link fix for NDK 27) ───
+function patchExpoModulesCoreCMake() {
+  const nodeModulesDir = path.join(__dirname, '..', 'node_modules');
+  const cmakePath = path.join(nodeModulesDir, 'expo-modules-core', 'android', 'cmake', 'common.cmake');
+  if (fs.existsSync(cmakePath)) {
+    let content = fs.readFileSync(cmakePath, 'utf8');
+    if (content.includes('ReactAndroid::reactnative') && !content.includes('c++_shared')) {
+      content = content.replace(
+        'ReactAndroid::reactnative',
+        'ReactAndroid::reactnative\n  c++_shared'
+      );
+      fs.writeFileSync(cmakePath, content, 'utf8');
+      console.log('[Patch] Added c++_shared link target to expo-modules-core common.cmake');
+    } else {
+      console.log('[Patch] expo-modules-core common.cmake already patched or target pattern not found.');
+    }
+  }
+}
+
+// ─── Patch 8: react-native-reanimated CMakeLists.txt (c++_shared link fix for NDK 27) ───
+function patchReanimatedCMake() {
+  const nodeModulesDir = path.join(__dirname, '..', 'node_modules');
+  const cmakePath = path.join(nodeModulesDir, 'react-native-reanimated', 'android', 'CMakeLists.txt');
+  if (fs.existsSync(cmakePath)) {
+    let content = fs.readFileSync(cmakePath, 'utf8');
+    if (content.includes('react-native-worklets::worklets') && !content.includes('c++_shared')) {
+      content = content.replace(
+        'react-native-worklets::worklets)',
+        'react-native-worklets::worklets\n  c++_shared)'
+      );
+      fs.writeFileSync(cmakePath, content, 'utf8');
+      console.log('[Patch] Added c++_shared link target to react-native-reanimated CMakeLists.txt');
+    } else {
+      console.log('[Patch] react-native-reanimated CMakeLists.txt already patched or target pattern not found.');
+    }
+  }
+}
+
+// ─── Patch 9: react-native-svg CMakeLists.txt (c++_shared link fix for NDK 27) ───
+function patchSvgCMake() {
+  const nodeModulesDir = path.join(__dirname, '..', 'node_modules');
+  const cmakePath = path.join(nodeModulesDir, 'react-native-svg', 'android', 'src', 'main', 'jni', 'CMakeLists.txt');
+  if (fs.existsSync(cmakePath)) {
+    let content = fs.readFileSync(cmakePath, 'utf8');
+    if (content.includes('fbjni') && !content.includes('c++_shared')) {
+      content = content.replace(
+        /target_link_libraries\(\s*react_codegen_rnsvg\s*fbjni\s*\)/,
+        'target_link_libraries(\n  react_codegen_rnsvg\n  fbjni\n  c++_shared\n)'
+      );
+      fs.writeFileSync(cmakePath, content, 'utf8');
+      console.log('[Patch] Added c++_shared link target to react-native-svg CMakeLists.txt');
+    } else {
+      console.log('[Patch] react-native-svg CMakeLists.txt already patched or target pattern not found.');
+    }
+  }
+}
+
+// ─── Patch 10: react-native-gesture-handler CMakeLists.txt (c++_shared link fix for NDK 27) ───
+function patchGestureHandlerCMake() {
+  const nodeModulesDir = path.join(__dirname, '..', 'node_modules');
+  const cmakePaths = [
+    path.join(nodeModulesDir, 'react-native-gesture-handler', 'android', 'CMakeLists.txt'),
+    path.join(nodeModulesDir, 'react-native-gesture-handler', 'android', 'src', 'main', 'jni', 'CMakeLists.txt'),
+  ];
+  for (const cmakePath of cmakePaths) {
+    if (fs.existsSync(cmakePath)) {
+      let content = fs.readFileSync(cmakePath, 'utf8');
+      if (!content.includes('c++_shared')) {
+        content = content.replace(
+          /target_link_libraries\(\s*([\s\S]*?)\)/g,
+          (match, p1) => `target_link_libraries(${p1.trim()}\n  c++_shared\n)`
+        );
+        fs.writeFileSync(cmakePath, content, 'utf8');
+        console.log(`[Patch] Added c++_shared link target to ${cmakePath}`);
+      }
+    }
+  }
+}
+
+// ─── Patch 11: react-native-safe-area-context CMakeLists.txt ───
+function patchSafeAreaCMake() {
+  const nodeModulesDir = path.join(__dirname, '..', 'node_modules');
+  const cmakePath = path.join(nodeModulesDir, 'react-native-safe-area-context', 'android', 'src', 'main', 'jni', 'CMakeLists.txt');
+  if (fs.existsSync(cmakePath)) {
+    let content = fs.readFileSync(cmakePath, 'utf8');
+    if (!content.includes('c++_shared')) {
+      content = content.replace(
+        'reactnative\n  )',
+        'reactnative\n          c++_shared\n  )'
+      );
+      fs.writeFileSync(cmakePath, content, 'utf8');
+      console.log('[Patch] Added c++_shared link target to react-native-safe-area-context CMakeLists.txt');
+    }
+  }
+}
+
+// ─── Patch 12: ReactNative-application.cmake (appmodules & autolinked libraries) ───
+function patchReactNativeApplicationCMake() {
+  const nodeModulesDir = path.join(__dirname, '..', 'node_modules');
+  const cmakePath = path.join(nodeModulesDir, 'react-native', 'ReactAndroid', 'cmake-utils', 'ReactNative-application.cmake');
+  if (fs.existsSync(cmakePath)) {
+    let content = fs.readFileSync(cmakePath, 'utf8');
+    if (!content.includes('c++_shared')) {
+      content = content.replace(
+        'target_link_libraries(${autolinked_library} common_flags)',
+        'target_link_libraries(${autolinked_library} common_flags c++_shared)'
+      );
+      content = content.replace(
+        'target_link_libraries(${CMAKE_PROJECT_NAME} ${AUTOLINKED_LIBRARIES})',
+        'target_link_libraries(${CMAKE_PROJECT_NAME} ${AUTOLINKED_LIBRARIES} c++_shared)'
+      );
+      fs.writeFileSync(cmakePath, content, 'utf8');
+      console.log('[Patch] Added c++_shared link target to ReactNative-application.cmake');
+    }
+  }
+}
+
 patchReanimatedInterpolator();
 patchScreensCMake();
 patchWorkletsCMake();
+patchExpoModulesCoreCMake();
+patchReanimatedCMake();
+patchSvgCMake();
+patchGestureHandlerCMake();
+patchSafeAreaCMake();
+patchReactNativeApplicationCMake();
 
 console.log('[Patch] Complete.');
+
+
+
+
