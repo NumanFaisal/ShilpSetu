@@ -11,8 +11,10 @@
  * - AI pricing: 1.5s
  * - AI assistant response: 1.5–2.5s
  */
-
+import * as FileSystem from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+
 import {
   ARTISAN,
   BUYER,
@@ -35,6 +37,14 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const simulateFailure = (shouldFail: boolean, message: string) => {
   if (shouldFail) throw new Error(message);
 };
+
+// Point this at your running server (see /server). Set EXPO_PUBLIC_API_URL in a
+// .env at the project root for device/emulator testing, e.g.
+// EXPO_PUBLIC_API_URL=http://192.168.1.5:4000
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  (Constants.expoConfig?.extra as any)?.apiUrl ||
+  'http://localhost:4000';
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
@@ -152,22 +162,34 @@ export const processVoice = async (
     description?: string;
   };
 }> => {
-  await delay(2000);
-  simulateFailure(options?.simulateError ?? false, 'Voice recognition failed. Please try again.');
-  console.log('[API] Voice processed from:', audioUri);
-  return {
-    transcription:
-      'This is a handcrafted bamboo basket made using traditional weaving technique from Madhubani Bihar. It is made from locally sourced bamboo and features traditional folk art patterns. Size is about twelve by ten inches.',
-    detectedLanguage: 'hi-IN',
-    extractedAttributes: {
-      productName: 'Handcrafted Bamboo Basket',
-      material: 'Bamboo',
-      craftType: 'Bamboo Craft',
-      size: '12×10 inches',
-      description:
-        'A handcrafted bamboo basket made using traditional weaving techniques from Madhubani, Bihar. Features traditional folk art patterns.',
-    },
-  };
+  if (options?.simulateError) {
+    await delay(500);
+    simulateFailure(true, 'Voice recognition failed. Please try again.');
+  }
+
+  const uploadResult = await FileSystem.uploadAsync(
+  `${API_BASE_URL}/api/voice/process`,
+  audioUri,
+  {
+    httpMethod: 'POST',
+    uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+    fieldName: 'audio',
+    mimeType: 'audio/m4a',
+    parameters: {},
+  }
+);
+
+if (uploadResult.status < 200 || uploadResult.status >= 300) {
+  let message = 'Voice recognition failed. Please try again.';
+  try {
+    message = JSON.parse(uploadResult.body).error || message;
+  } catch {}
+  throw new Error(message);
+}
+
+const result = JSON.parse(uploadResult.body);
+console.log('[API] Voice processed from:', audioUri);
+return result;
 };
 
 // ─── AI — Catalog Generation ─────────────────────────────────────────────────
@@ -177,13 +199,34 @@ export const generateCatalog = async (
     images: string[];
     voiceTranscription?: string;
     manualDescription?: string;
+    attributes?: { material?: string; craftType?: string };
   },
   options?: { simulateError?: boolean }
 ): Promise<typeof PRODUCT> => {
-  await delay(3000); // Longest AI step
-  simulateFailure(options?.simulateError ?? false, 'Catalog generation failed. Please try again.');
+  if (options?.simulateError) {
+    await delay(500);
+    simulateFailure(true, 'Catalog generation failed. Please try again.');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/catalog/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      voiceTranscription: draft.voiceTranscription,
+      manualDescription: draft.manualDescription,
+      attributes: draft.attributes,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Catalog generation failed. Please try again.');
+  }
+
+  const generated = await response.json();
   console.log('[API] Catalog generated from draft');
-  return PRODUCT;
+  // Merge into PRODUCT shape so screens relying on other PRODUCT fields (images, etc.) still work
+  return { ...PRODUCT, ...generated, images: draft.images?.length ? draft.images : PRODUCT.images };
 };
 
 // ─── AI — Pricing ────────────────────────────────────────────────────────────

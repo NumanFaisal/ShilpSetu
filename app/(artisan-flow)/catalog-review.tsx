@@ -6,14 +6,20 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { AIBadge } from '../../components/ui/AIBadge';
 import { useAppStore } from '../../store/useAppStore';
-import { PRODUCT } from '../../mocks/seed';
 
 export default function CatalogReviewScreen() {
-  const { draftProduct, updateDraftProduct } = useAppStore();
-  const product = PRODUCT; // AI-generated mock
+  const { draftProduct } = useAppStore();
 
-  const [name, setName] = useState<string>(draftProduct.name || product.name);
-  const [description, setDescription] = useState<string>(product.aiDescription);
+  const [name, setName] = useState<string>(draftProduct.name || '');
+  const [description, setDescription] = useState<string>(draftProduct.description || '');
+
+  const details = [
+    { label: 'Category', value: draftProduct.category },
+    { label: 'Material', value: draftProduct.material },
+    { label: 'Craft Type', value: draftProduct.craftType },
+  ].filter((d) => d.value);
+
+  const tags = draftProduct.tags || [];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF8F6' }}>
@@ -26,10 +32,10 @@ export default function CatalogReviewScreen() {
         </View>
 
         {/* Photos */}
-        {(draftProduct.images || [product.images[0]]).length > 0 && (
+        {(draftProduct.images || []).length > 0 && (
           <View style={{ marginBottom: 20 }}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
-              {(draftProduct.images || product.images).map((uri, i) => (
+              {(draftProduct.images || []).map((uri, i) => (
                 <Image key={i} source={{ uri }} style={{ width: 110, height: 110, borderRadius: 10, backgroundColor: '#F6EEDF' }} />
               ))}
             </ScrollView>
@@ -47,19 +53,16 @@ export default function CatalogReviewScreen() {
           </View>
 
           {/* Product details */}
-          <View style={{ backgroundColor: '#FFFDF8', borderRadius: 12, borderWidth: 1, borderColor: '#E4D8C3', padding: 16, gap: 10 }}>
-            {[
-              { label: 'Category', value: product.category },
-              { label: 'Material', value: product.material },
-              { label: 'Craft Type', value: product.craftType },
-              { label: 'Origin', value: product.origin },
-            ].map((item) => (
-              <View key={item.label} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 13, color: '#8A726B' }}>{item.label}</Text>
-                <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 13, color: '#2B2420' }}>{item.value}</Text>
-              </View>
-            ))}
-          </View>
+          {details.length > 0 && (
+            <View style={{ backgroundColor: '#FFFDF8', borderRadius: 12, borderWidth: 1, borderColor: '#E4D8C3', padding: 16, gap: 10 }}>
+              {details.map((item) => (
+                <View key={item.label} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 13, color: '#8A726B' }}>{item.label}</Text>
+                  <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 13, color: '#2B2420' }}>{item.value}</Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           {/* AI description */}
           <View style={{ gap: 8 }}>
@@ -77,16 +80,18 @@ export default function CatalogReviewScreen() {
           </View>
 
           {/* Tags */}
-          <View style={{ gap: 8 }}>
-            <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 14, color: '#2B2420' }}>Tags</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-              {product.tags.map((tag) => (
-                <View key={tag} style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999, backgroundColor: '#F6EEDF', borderWidth: 1, borderColor: '#E4D8C3' }}>
-                  <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: '#56423C' }}>{tag}</Text>
-                </View>
-              ))}
+          {tags.length > 0 && (
+            <View style={{ gap: 8 }}>
+              <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 14, color: '#2B2420' }}>Tags</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {tags.map((tag) => (
+                  <View key={tag} style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 9999, backgroundColor: '#F6EEDF', borderWidth: 1, borderColor: '#E4D8C3' }}>
+                    <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: '#56423C' }}>{tag}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
-          </View>
+          )}
         </View>
       </ScrollView>
 
