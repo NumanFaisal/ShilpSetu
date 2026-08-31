@@ -13,6 +13,7 @@ expo-env.d.ts
 .kotlin/
 *.orig.*
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
@@ -25,6 +26,8 @@ expo-env.d.ts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+gradle_build*.log
+
 
 # macOS
 .DS_Store

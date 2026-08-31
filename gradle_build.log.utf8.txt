@@ -1,0 +1,48 @@
+﻿Initialized native services in: C:\Users\Numan Faisal\.gradle\native
+Initialized jansi services in: C:\Users\Numan Faisal\.gradle\native
+Removing 0 daemon stop events from registry
+Previous Daemon (19936) stopped at Fri Aug 28 00:32:15 IST 2026 stop command received
+Previous Daemon (13628) stopped at Fri Aug 28 00:28:14 IST 2026 by user or operating system
+Previous Daemon (31204) stopped at Fri Aug 28 00:29:52 IST 2026 by user or operating system
+Previous Daemon (12420) stopped at Fri Aug 28 00:32:14 IST 2026 by user or operating system
+Previous Daemon (27700) stopped at Fri Aug 28 00:32:14 IST 2026 by user or operating system
+Previous Daemon (37176) stopped at Fri Aug 28 00:32:14 IST 2026 by user or operating system
+Previous Daemon (30932) stopped at Fri Aug 28 00:32:16 IST 2026 by user or operating system
+Starting a Gradle Daemon, 1 busy and 7 stopped Daemons could not be reused, use --status for details
+Starting process 'Gradle build daemon'. Working directory: C:\Users\Numan Faisal\.gradle\daemon\8.13 Command: C:\Program Files\Java\jdk-17\bin\java.exe --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED -XX:MaxMetaspaceSize=384m -XX:+HeapDumpOnOutOfMemoryError -Xms256m -Xmx512m -Dfile.encoding=windows-1252 -Duser.country=IN -Duser.language=en -Duser.variant -cp C:\Users\Numan Faisal\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13\lib\gradle-daemon-main-8.13.jar -javaagent:C:\Users\Numan Faisal\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13\lib\agents\gradle-instrumentation-agent-8.13.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.13
+Successfully started process 'Gradle build daemon'
+An attempt to start the daemon took 5.203 secs.
+The client will now receive all logging from the daemon (pid: 29036). The daemon log file: C:\Users\Numan Faisal\.gradle\daemon\8.13\daemon-29036.out.log
+Starting build in new daemon [memory: 512 MiB]
+Using 8 worker leases.
+.\android\gradlew.bat : 
+At line:1 char:1
++ .\android\gradlew.bat app:assembleDebug -x lint -x test --build-cache ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Directory 'D:\ShilpSetu' does not contain a Gradle build.
+
+A Gradle build's root directory should contain one of the possible settings files: settings.gradle, 
+settings.gradle.kts, settings.gradle.dcl.It may also contain one of the possible build files: build.gradle, 
+build.gradle.kts, build.gradle.dcl.
+
+To create a new Gradle build in this directory run 'gradlew init'
+
+For more information about the 'init' task, please refer to 
+https://docs.gradle.org/8.13/userguide/build_init_plugin.html in the Gradle documentation.
+
+For more details on creating a Gradle build, please refer to 
+https://docs.gradle.org/8.13/userguide/tutorial_using_tasks.html in the Gradle documentation.
+
+* Try:
+> Run gradlew init to create a new Gradle build in this directory.
+> Run with --stacktrace option to get the stack trace.
+> Run with --debug option to get more log output.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 11s

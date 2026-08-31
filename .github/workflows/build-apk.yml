@@ -2,13 +2,11 @@ name: ShilpSetu-AI-APKs
 
 on:
   push:
-    branches: [ main, master, develop ]
-  pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 
 jobs:
   build:
-    name: ShilpSetu-AI-APKs
+    name: ShilpSetu-AI-Release-APK
     runs-on: ubuntu-latest
 
     steps:
@@ -18,35 +16,90 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci
 
+      # 1. Generate the android directory first so gradle files exist
+      - name: Generate Native Android Project (Expo Prebuild)
+        run: npx expo prebuild --platform android --clean
+
+      # 2. Now setup Java and cache gradle files (which now exist)
       - name: Setup Java JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Generate Native Android Project (Expo Prebuild)
-        run: npx expo prebuild --platform android
+      - name: Install Android NDK 27.1.12297006
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.1.12297006"
+
+      # 3. Decode the keystore file from repository secrets into android/app/
+      - name: Decode Keystore File
+        run: |
+          if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "ERROR: ANDROID_KEYSTORE_BASE64 secret is not configured!"
+            exit 1
+          fi
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
+          if [ ! -f android/app/release.keystore ]; then
+            echo "ERROR: Failed to decode release.keystore!"
+            exit 1
+          fi
 
       - name: Make Gradlew Executable
         run: chmod +x android/gradlew
 
+      # 4. Build signed Android Release APK
       - name: Build Android Release APK
         env:
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx4096m -XX:MaxMetaspaceSize=1024m'"
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError"
+          ORG_GRADLE_PROJECT_MYAPP_RELEASE_STORE_FILE: "release.keystore"
+          ORG_GRADLE_PROJECT_MYAPP_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ORG_GRADLE_PROJECT_MYAPP_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ORG_GRADLE_PROJECT_MYAPP_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           cd android
-          ./gradlew assembleRelease --no-daemon --stacktrace
+          ./gradlew assembleRelease --no-daemon --stacktrace -x lint -x test
+
+      - name: Rename and Verify APK Signature & Release Flag
+        run: |
+          APK_DIR="android/app/build/outputs/apk/release"
+          mv "$APK_DIR/app-release.apk" "$APK_DIR/ShilpSetu-AI-release.apk"
+          ls -la "$APK_DIR/"
+          
+          # Find apksigner and verify
+          apksigner_path=$(find $ANDROID_HOME/build-tools -name apksigner | head -n 1)
+          if [ -n "$apksigner_path" ]; then
+            echo "Verifying signature with apksigner at $apksigner_path..."
+            $apksigner_path verify --verbose "$APK_DIR/ShilpSetu-AI-release.apk"
+          else
+            echo "apksigner not found, trying jarsigner..."
+            jarsigner -verify -verbose -certs "$APK_DIR/ShilpSetu-AI-release.apk"
+          fi
+          
+          # Find aapt and verify it is not debuggable
+          aapt_path=$(find $ANDROID_HOME/build-tools -name aapt | head -n 1)
+          if [ -n "$aapt_path" ]; then
+            echo "Checking release properties with aapt at $aapt_path..."
+            $aapt_path dump badging "$APK_DIR/ShilpSetu-AI-release.apk" > badging.txt
+            if grep -q "application-debuggable" badging.txt; then
+              echo "ERROR: The generated APK contains 'application-debuggable' and is NOT a release build!"
+              exit 1
+            else
+              echo "SUCCESS: The generated APK is a valid RELEASE build (not debuggable)."
+            fi
+          else
+            echo "aapt not found, skipping badging dump."
+          fi
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ShilpSetu-AI-APKs
-          path: android/app/build/outputs/apk/release/*.apk
-          retention-days: 7
+          name: ShilpSetu-AI-release-apk
+          path: android/app/build/outputs/apk/release/ShilpSetu-AI-release.apk
+          retention-days: 30

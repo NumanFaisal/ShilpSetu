@@ -6,13 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": false,
     "scheme": "shilpsetu",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#FFF8F6"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.shilpsetu.app",
@@ -28,6 +22,7 @@
         "backgroundColor": "#FFF8F6"
       },
       "package": "com.shilpsetu.app",
+      "versionCode": 1,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
@@ -40,8 +35,19 @@
       "bundler": "metro"
     },
     "plugins": [
+      "./scripts/withCpp20",
+      "./scripts/withAndroidSigning",
+      "./scripts/withGlobalExt",
       "expo-router",
       "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#FFF8F6"
+        }
+      ],
       [
         "expo-camera",
         {
@@ -54,7 +60,15 @@
           "photosPermission": "Allow ShilpSetu to access your photos for product listings."
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "ndkVersion": "27.1.12297006"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
