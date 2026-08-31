@@ -10,6 +10,8 @@ export interface DraftProduct {
   name: string;
   category: string;
   material: string;
+  craftType: string;
+  tags: string[];
   price: number;
   quantity: number;
 }

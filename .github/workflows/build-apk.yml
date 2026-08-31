@@ -34,6 +34,10 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
+      - name: Install Android NDK 27.1.12297006
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "ndk;27.1.12297006"
+
       # 3. Decode the keystore file from repository secrets into android/app/
       - name: Decode Keystore File
         run: |
