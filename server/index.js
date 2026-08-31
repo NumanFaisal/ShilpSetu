@@ -4,7 +4,6 @@ import cors from 'cors';
 import fs from 'fs';
 import voiceRouter from './routes/voice.js';
 import catalogRouter from './routes/catalog.js';
-import pricingRouter from './routes/pricing.js';
 
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
@@ -14,7 +13,6 @@ app.use(express.json({ limit: '2mb' }));
 
 app.use('/api/voice', voiceRouter);
 app.use('/api/catalog', catalogRouter);
-app.use('/api/pricing', pricingRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
