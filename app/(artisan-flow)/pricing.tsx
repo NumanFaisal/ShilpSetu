@@ -7,13 +7,13 @@ import { AIBadge } from '../../components/ui/AIBadge';
 import { Card } from '../../components/ui/Card';
 import { getAIPricing } from '../../services/api';
 import { useAppStore } from '../../store/useAppStore';
-import { PRODUCT } from '../../mocks/seed';
 
 export default function PricingScreen() {
   const { draftProduct, updateDraftProduct, isOnline } = useAppStore();
   const [loading, setLoading] = useState(true);
   const [aiPricing, setAiPricing] = useState<any>(null);
-  const [price, setPrice] = useState('899');
+  const [error, setError] = useState<string | null>(null);
+  const [price, setPrice] = useState('');
 
   useEffect(() => {
     fetchPricing();
@@ -21,24 +21,28 @@ export default function PricingScreen() {
 
   const fetchPricing = async () => {
     setLoading(true);
+    setError(null);
     try {
       const result = await getAIPricing({
-        name: draftProduct.name || PRODUCT.name,
-        category: draftProduct.category || PRODUCT.category,
-        material: draftProduct.material || PRODUCT.material,
-        quantity: draftProduct.quantity || 10,
+        name: draftProduct.name || '',
+        category: draftProduct.category || '',
+        material: draftProduct.material || '',
+        quantity: draftProduct.quantity || 1,
       });
       setAiPricing(result);
       setPrice(String(result.suggested));
-    } catch {
-      setPrice('899');
+    } catch (e: any) {
+      setError(e?.message || 'Could not fetch a pricing suggestion.');
     } finally {
       setLoading(false);
     }
+    console.log('[Pricing] Sending:', draftProduct.name, draftProduct.category, draftProduct.material);
   };
 
   const handlePublish = async () => {
-    updateDraftProduct({ price: parseInt(price) });
+    const parsed = parseInt(price, 10);
+    if (!parsed || parsed <= 0) return;
+    updateDraftProduct({ price: parsed });
     router.push('/(artisan-flow)/publish-success');
   };
 
@@ -71,6 +75,13 @@ export default function PricingScreen() {
           {/* AI pricing card */}
           {loading ? (
             <Card><Text style={{ fontFamily: 'Inter_400Regular', fontSize: 14, color: '#8A726B' }}>Analysing market prices...</Text></Card>
+          ) : error ? (
+            <Card>
+              <View style={{ gap: 10 }}>
+                <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 14, color: '#B5502F' }}>{error}</Text>
+                <Button label="Retry Pricing Suggestion" onPress={fetchPricing} variant="secondary" />
+              </View>
+            </Card>
           ) : aiPricing && (
             <Card>
               <View style={{ gap: 14 }}>

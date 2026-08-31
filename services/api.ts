@@ -240,16 +240,18 @@ export const getAIPricing = async (
   reasoning: string;
   marketInsight: string;
 }> => {
-  await delay(1500);
-  return {
-    suggested: 899,
-    min: 750,
-    max: 1100,
-    reasoning:
-      'Based on 847 similar bamboo craft listings, current market demand, and your production cost estimate, ₹899 maximises both competitiveness and profit margin.',
-    marketInsight:
-      'Bamboo home décor demand is up 28% this season. Artisans in your region are successfully selling at ₹900–1,100.',
-  };
+  const response = await fetch(`${API_BASE_URL}/api/pricing/estimate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(productData),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Pricing estimate failed. Please try again.');
+  }
+
+  return response.json();
 };
 
 // ─── AI — Product Publishing ─────────────────────────────────────────────────
