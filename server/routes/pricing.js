@@ -3,56 +3,91 @@ import { openai, CHAT_MODEL } from '../openaiClient.js';
 
 const router = express.Router();
 
-const PRICING_PROMPT = `You are a pricing assistant for an Indian artisan marketplace (MoSJE). Given a
-product's name, category, material, and order quantity, estimate a fair retail price range in INR (₹)
-for a single unit, based on realistic market knowledge of similar handmade/craft goods in India.
+const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
+
+const SYNTHESIS_PROMPT = `You are a pricing assistant for an Indian artisan marketplace (MoSJE). You are
+given the artisan's actual production cost (material + labour) and real web search results about
+market prices for similar products in India. Your job is to read the search results and extract a
+realistic market price range grounded in what they actually say — never invent numbers not supported
+by the search snippets.
 
 Return JSON only, no prose, no markdown fences:
 {
-  "min": number,          // lower bound of a fair price range, in INR
-  "suggested": number,    // recommended price, in INR
-  "max": number,          // upper bound of a fair price range, in INR
-  "reasoning": string,    // 1-2 sentences on how you arrived at this price, referencing the actual
-                           // product details given (category/material/quantity) — do not invent
-                           // specific numbers like listing counts or percentages you don't actually know
-  "marketInsight": string // 1 short sentence of general, honest market context for this category —
-                           // avoid fabricating precise statistics (e.g. "X% increase") you can't verify
+  "marketMin": number,     // lowest realistic market price (INR) found/implied in the search results
+  "marketMax": number,     // highest realistic market price (INR) found/implied in the search results
+  "suggested": number,     // final recommended price — must be >= baseCost provided, balanced against market range
+  "reasoning": string      // 2-3 sentences: how you weighed base cost vs market range to land on suggested price
 }
 
 Rules:
-- Base the estimate on the actual category/material provided — if these are vague or missing, give a
-  wider, more conservative range and say so in the reasoning rather than pretending precision.
-- Do not cite fake data points (e.g. "847 similar listings") — keep reasoning honest and general.
-- suggested must be between min and max.`;
+- suggested must never be below baseCost (the artisan should never sell at a loss).
+- If search results are sparse, unclear, or don't mention real prices, say so honestly in reasoning
+  and fall back to a conservative range starting near baseCost — do not fabricate specific figures.
+- Do not cite fake statistics not present in the search results.`;
+
+async function tavilySearch(query) {
+  if (!TAVILY_API_KEY) return { results: [] };
+  const res = await fetch('https://api.tavily.com/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      api_key: TAVILY_API_KEY,
+      query,
+      search_depth: 'basic',
+      max_results: 6,
+    }),
+  });
+  if (!res.ok) return { results: [] };
+  return res.json();
+}
 
 // POST /api/pricing/estimate
 router.post('/estimate', async (req, res) => {
   try {
-    const { name, category, material, quantity } = req.body || {};
+    const { name, category, material, materialCost, labourHours, wageRate, quantity } = req.body || {};
 
-    if (!category && !material && !name) {
+    if (!name && !category) {
       return res.status(400).json({ error: 'No product details provided' });
     }
 
+    const matCost = Number(materialCost) || 0;
+    const hours = Number(labourHours) || 0;
+    const wage = Number(wageRate) || 0;
+    const baseCost = Math.round(matCost + hours * wage);
+
+    const query = `${name || category} handmade price India ₹`;
+    const searchData = await tavilySearch(query);
+    const results = (searchData.results || []).slice(0, 6);
+
+    const sources = results.map((r) => ({ title: r.title, url: r.url }));
+    const searchContext = results.map((r) => `- ${r.title}: ${r.content?.slice(0, 300)}`).join('\n');
+
     const userContent = JSON.stringify({
-      name: name || '',
-      category: category || '',
-      material: material || '',
-      quantity: quantity || 1,
+      product: { name, category, material, quantity: quantity || 1 },
+      baseCost,
+      searchResults: searchContext || 'No search results found.',
     });
 
     const completion = await openai.chat.completions.create({
       model: CHAT_MODEL,
-      temperature: 0.3,
+      temperature: 0.2,
       messages: [
-        { role: 'system', content: PRICING_PROMPT },
+        { role: 'system', content: SYNTHESIS_PROMPT },
         { role: 'user', content: userContent },
       ],
       response_format: { type: 'json_object' },
     });
 
-    const pricing = JSON.parse(completion.choices[0].message.content);
-    res.json(pricing);
+    const synthesis = JSON.parse(completion.choices[0].message.content);
+
+    res.json({
+      baseCost,
+      marketMin: synthesis.marketMin,
+      marketMax: synthesis.marketMax,
+      suggested: synthesis.suggested,
+      reasoning: synthesis.reasoning,
+      sources,
+    });
   } catch (err) {
     console.error('[pricing/estimate] error:', err.message);
     res.status(500).json({ error: 'Pricing estimate failed. Please try again.' });
