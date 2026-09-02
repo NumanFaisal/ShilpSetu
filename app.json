@@ -60,6 +60,7 @@
           "photosPermission": "Allow ShilpSetu to access your photos for product listings."
         }
       ],
+      "expo-audio",
       [
         "expo-build-properties",
         {
@@ -71,6 +72,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "85123583-d58f-40d7-ab9d-ea1337d51f3a"
+      }
     }
   }
 }

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, SafeAreaView, TouchableOpacity, Animated, Easing } from 'react-native';
 import { router } from 'expo-router';
+import { useAudioRecorder, RecordingPresets, AudioModule, useAudioRecorderState } from 'expo-audio';
 import { Mic, MicOff, ChevronRight, Edit3 } from 'lucide-react-native';
 import { Header } from '../../components/ui/Header';
 import { Button } from '../../components/ui/Button';
@@ -14,20 +15,36 @@ export default function VoiceDescriptionScreen() {
   const [processing, setProcessing] = useState(false);
   const [done, setDone] = useState(false);
   const [transcription, setTranscription] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [attributes, setAttributes] = useState<Record<string, string>>({});
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const pulseLoop = useRef<Animated.CompositeAnimation | null>(null);
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
-  const startRecording = () => {
-    setRecording(true);
-    // Pulsing animation
-    pulseLoop.current = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.2, duration: 600, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1, duration: 600, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-      ])
-    );
-    pulseLoop.current.start();
+  const startRecording = async () => {
+    try {
+      const permission = await AudioModule.requestRecordingPermissionsAsync();
+      if (!permission.granted) {
+        console.warn('Microphone permission denied');
+        return;
+      }
+      await AudioModule.setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
+
+      await audioRecorder.prepareToRecordAsync();
+      audioRecorder.record();
+
+      setRecording(true);
+      // Pulsing animation
+      pulseLoop.current = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1.2, duration: 600, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 1, duration: 600, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        ])
+      );
+      pulseLoop.current.start();
+    } catch (e) {
+      console.error('Failed to start recording:', e);
+    }
   };
 
   const stopRecording = async () => {
@@ -37,22 +54,45 @@ export default function VoiceDescriptionScreen() {
     setProcessing(true);
 
     try {
-      const result = await processVoice('mock-audio.mp4', { simulateError: simulateAIError });
+      await audioRecorder.stop();
+      const uri = audioRecorder.uri;
+      if (!uri) throw new Error('Recording produced no file');
+
+      const result = await processVoice(uri, { simulateError: simulateAIError });
       setTranscription(result.transcription);
       setAttributes(result.extractedAttributes as Record<string, string>);
       updateDraftProduct({
         name: result.extractedAttributes.productName || '',
         material: result.extractedAttributes.material || '',
         description: result.transcription,
-        category: result.extractedAttributes.craftType || '',
+        craftType: result.extractedAttributes.craftType || '',
       });
       setDone(true);
-    } catch (e) {
-      router.push('/(artisan-flow)/manual-description');
+    } catch (e: any) {
+      console.error('Voice processing failed:', e);
+      setError(e?.message || 'Something went wrong while processing your recording.');
     } finally {
       setProcessing(false);
     }
   };
+
+  if (error) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF8F6' }}>
+        <Header title="Voice Processing Failed" showBack />
+        <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 40, gap: 20, alignItems: 'center' }}>
+          <Text style={{ fontFamily: 'Fraunces_600SemiBold', fontSize: 20, color: '#2B2420', textAlign: 'center' }}>
+            Couldn't process your recording
+          </Text>
+          <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 14, color: '#8A726B', textAlign: 'center' }}>
+            {error}
+          </Text>
+          <Button label="Try Recording Again" onPress={() => setError(null)} />
+          <Button label="Enter Manually Instead" onPress={() => router.push('/(artisan-flow)/manual-description')} variant="secondary" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (processing) {
     return (

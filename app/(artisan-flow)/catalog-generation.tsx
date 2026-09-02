@@ -32,14 +32,23 @@ export default function CatalogGenerationScreen() {
 
     try {
       const catalog = await generateCatalog(
-        { images: draftProduct.images || [], manualDescription: draftProduct.description },
+        {
+          images: draftProduct.images || [],
+          voiceTranscription: draftProduct.description,
+          attributes: { material: draftProduct.material, craftType: draftProduct.craftType },
+        },
         { simulateError: simulateAIError }
       );
       clearInterval(interval);
       setCurrentStep(STEPS.length - 1);
       // Short pause to let the last step animate
       await new Promise((r) => setTimeout(r, 400));
-      updateDraftProduct({ name: catalog.name, description: catalog.aiDescription });
+      updateDraftProduct({
+        name: catalog.name,
+        description: catalog.aiDescription,
+        category: catalog.category,
+        tags: catalog.tags,
+      });
       router.replace('/(artisan-flow)/catalog-review');
     } catch (e: any) {
       clearInterval(interval);

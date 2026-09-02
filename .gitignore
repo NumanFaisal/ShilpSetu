@@ -42,3 +42,5 @@ gradle_build*.log
 # generated native folders
 /ios
 /android
+
+.env
