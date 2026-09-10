@@ -8,7 +8,7 @@ import { Card } from '../../components/ui/Card';
 import { AIBadge } from '../../components/ui/AIBadge';
 import { OfflineBanner } from '../../components/ui/OfflineBanner';
 import { useAppStore } from '../../store/useAppStore';
-import { getAIInsights } from '../../services/api';
+import { getAIInsights, getArtisanProfile } from '../../services/api';
 import { ARTISAN, ORDER, AI_INSIGHTS, BUYER_REQUEST } from '../../mocks/seed';
 
 const StatCard = ({ value, label, sub }: { value: string; label: string; sub?: string }) => (
@@ -33,12 +33,33 @@ export default function ArtisanHomeScreen() {
   const { isOnline, offlineQueue } = useAppStore();
   const [refreshing, setRefreshing] = useState(false);
   const [insights, setInsights] = useState(AI_INSIGHTS);
+  const [artisan, setArtisanData] = useState(ARTISAN);
+  const [loading, setLoading] = useState(true);
 
-  const artisan = ARTISAN;
+  const fetchProfile = async (signal?: AbortSignal) => {
+    try {
+      const data = await getArtisanProfile({ signal });
+      if (data) {
+        setArtisanData(data);
+      }
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        console.warn('[ArtisanHome] Profile fetch error:', err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchProfile(controller.signal);
+    return () => controller.abort();
+  }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await new Promise((r) => setTimeout(r, 1000));
+    await fetchProfile();
     setRefreshing(false);
   };
 

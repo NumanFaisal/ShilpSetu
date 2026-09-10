@@ -16,6 +16,9 @@ import * as FileSystem from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import { apiClient, ApiError, AUTH_TOKEN_KEY } from './apiClient';
+
+export { apiClient, ApiError };
 
 import {
   ARTISAN,
@@ -103,19 +106,15 @@ export const STORAGE_KEYS = {
 };
 
 export const getAuthToken = async (): Promise<string | null> => {
-  try {
-    return await AsyncStorage.getItem(STORAGE_KEYS.TOKEN);
-  } catch {
-    return null;
-  }
+  return apiClient.getAuthToken();
 };
 
 export const setAuthToken = async (token: string): Promise<void> => {
-  await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
+  await apiClient.setAuthToken(token);
 };
 
 export const removeAuthToken = async (): Promise<void> => {
-  await AsyncStorage.removeItem(STORAGE_KEYS.TOKEN);
+  await apiClient.removeAuthToken();
   await AsyncStorage.removeItem(STORAGE_KEYS.USER);
 };
 
@@ -363,54 +362,10 @@ async function apiRequest<T>(
   options: RequestInit = {},
   isPublic = false
 ): Promise<T> {
-  const url = getApiUrl(endpoint);
-  console.log(`[API Request] ${options.method || 'GET'} -> ${url}`);
-  const headers: Record<string, string> = {
-    ...(options.headers as Record<string, string>),
-  };
-
-  if (!isPublic) {
-    const token = await getAuthToken();
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-  }
-
-  if (!(options.body instanceof FormData) && !headers['Content-Type']) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
-
-    if (response.status === 204) {
-      return {} as T;
-    }
-
-    const contentType = response.headers.get('content-type') || '';
-    let responseData: any;
-
-    if (contentType.includes('application/json')) {
-      responseData = await response.json();
-    } else {
-      responseData = await response.text();
-    }
-
-    if (!response.ok) {
-      const errorMsg =
-        (typeof responseData === 'object' && (responseData?.error || responseData?.message)) ||
-        `HTTP ${response.status}: ${response.statusText}`;
-      throw new Error(errorMsg);
-    }
-
-    return responseData as T;
-  } catch (err: any) {
-    console.error(`[API Error] ${options.method || 'GET'} ${endpoint}:`, err.message);
-    throw err;
-  }
+  return apiClient.request<T>(endpoint, {
+    ...options,
+    skipAuth: isPublic,
+  });
 }
 
 // ─── 5. COMPATIBLE NAMED EXPORTS (FOR ALL CURRENT SCREENS) ─────────────────
@@ -557,75 +512,84 @@ export const setupArtisanProfile = async (data: {
 };
 
 /** Fetch Artisan Products */
-export const getMyProducts = async (options?: { simulateEmpty?: boolean }): Promise<any[]> => {
+export const getMyProducts = async (options?: { simulateEmpty?: boolean; signal?: AbortSignal }): Promise<any[]> => {
   if (options?.simulateEmpty) return [];
   try {
-    const store = await apiRequest<PublicStorefront>('/api/public/stores/master-artisan', {}, true);
-    if (store && store.products && store.products.length > 0) {
-      return store.products.map((p) => ({
+    const res = await apiClient.get<any>('/api/products', { signal: options?.signal });
+    const list = res?.products || (Array.isArray(res) ? res : []);
+    if (Array.isArray(list) && list.length > 0) {
+      return list.map((p) => ({
         ...p,
         id: String(p.id),
       }));
     }
-  } catch (e) {
-    console.log('[API] Fetching products fallback');
+  } catch (e: any) {
+    if (e.name === 'AbortError') throw e;
+    console.warn('[API] getMyProducts error:', e.message);
   }
-  return SAMPLE_PRODUCTS;
+  return options?.simulateEmpty ? [] : SAMPLE_PRODUCTS;
 };
 
-export const getProductById = async (id: string): Promise<any> => {
+export const getProductById = async (id: string, options?: { signal?: AbortSignal }): Promise<any> => {
   try {
-    const catalog = await apiRequest<ProductCatalog>(`/api/catalog/${id}`, {}, true);
-    if (catalog && catalog.id) {
-      return {
-        ...PRODUCT,
-        id: String(catalog.productId || id),
-        name: catalog.titleEn || PRODUCT.name,
-        titleEn: catalog.titleEn,
-        titleHi: catalog.titleHi,
-        description: catalog.descriptionEn || PRODUCT.description,
-        material: catalog.material || PRODUCT.material,
-        category: catalog.category || PRODUCT.category,
-      };
+    const numId = Number(id);
+    if (!isNaN(numId)) {
+      const p = await apiClient.get<any>(`/api/marketplace/products/${numId}`, { signal: options?.signal, skipAuth: true });
+      const product = p?.product || p;
+      if (product && product.id) {
+        return {
+          ...product,
+          id: String(product.id),
+        };
+      }
     }
-  } catch (e) {}
-  const found = SAMPLE_PRODUCTS.find((p) => p.id === id) || PRODUCT;
+  } catch (e: any) {
+    if (e.name === 'AbortError') throw e;
+    console.warn('[API] getProductById live fetch error:', e.message);
+  }
+  const found = SAMPLE_PRODUCTS.find((p) => String(p.id) === String(id)) || PRODUCT;
   return found;
 };
 
 export const getDiscoverProducts = async (filters?: {
   category?: string;
   search?: string;
+  signal?: AbortSignal;
 }): Promise<any[]> => {
-  let products = SAMPLE_PRODUCTS;
   try {
-    const store = await apiRequest<PublicStorefront>('/api/public/stores/master-artisan', {}, true);
-    if (store?.products?.length) {
-      products = store.products as any[];
-    }
-  } catch (e) {}
+    const params = new URLSearchParams();
+    if (filters?.search) params.append('q', filters.search);
+    if (filters?.category && filters.category !== 'all') params.append('category', filters.category);
 
-  if (filters?.category && filters.category !== 'all') {
-    const cat = filters.category.toLowerCase();
-    products = products.filter((p: any) => {
-      const c = (p.category || '').toLowerCase();
-      const ct = (p.craftType || '').toLowerCase();
-      const m = (p.material || '').toLowerCase();
-      const tags = (p.tags || []).join(' ').toLowerCase();
-      return c.includes(cat) || ct.includes(cat) || m.includes(cat) || tags.includes(cat);
+    const queryStr = params.toString() ? `?${params.toString()}` : '';
+    const res = await apiClient.get<any>(`/api/marketplace/search${queryStr}`, {
+      signal: filters?.signal,
+      skipAuth: true,
     });
-  }
+    const items = res?.items || (Array.isArray(res) ? res : []);
+    if (Array.isArray(items) && items.length > 0) {
+      return items.map((p: any) => {
+        const rawImages = Array.isArray(p.images) ? p.images : [];
+        const imageUrls = rawImages.map((img: any) =>
+          typeof img === 'string' ? img : img?.outputSquareUrl || img?.originalUrl || img?.url
+        ).filter(Boolean);
 
-  if (filters?.search) {
-    const q = filters.search.toLowerCase();
-    products = products.filter((p: any) =>
-      p.name.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q) ||
-      (p.material && p.material.toLowerCase().includes(q))
-    );
+        return {
+          ...p,
+          id: String(p.id),
+          images: imageUrls.length > 0 ? imageUrls : [
+            'https://images.unsplash.com/photo-1590736969955-71cc94801759?w=600&auto=format&fit=crop&q=80'
+          ],
+          origin: p.origin || p.craftType || (p.artisan?.state ? `${p.artisan.state}, India` : 'India'),
+          matchScore: p.matchScore || Math.floor(88 + ((Number(p.id) * 7) % 11)),
+        };
+      });
+    }
+  } catch (e: any) {
+    if (e.name === 'AbortError') throw e;
+    console.warn('[API] getDiscoverProducts error:', e.message);
   }
-
-  return products;
+  return DISCOVER_PRODUCTS;
 };
 
 /** Fetch real enhanced images for a specific batch ID */
@@ -1079,38 +1043,67 @@ export const getAIPricing = async (
   }
 };
 
+export const createProduct = async (productData: any): Promise<any> => {
+  const res = await apiClient.post<any>('/api/products', productData);
+  return res?.product || res;
+};
+
+export const updateProduct = async (id: number | string, data: any): Promise<any> => {
+  const res = await apiClient.patch<any>(`/api/products/${id}`, data);
+  return res?.product || res;
+};
+
+export const deleteProduct = async (id: number | string): Promise<any> => {
+  return apiClient.delete(`/api/products/${id}`);
+};
+
 /** Real Multi-Marketplace Sync (ONDC, GeM, Amazon) */
 export const publishProduct = async (
   product: Partial<typeof PRODUCT> & { id?: string | number },
   options?: { isOffline?: boolean }
 ): Promise<{ id: number | string; productId: string; published: boolean; results?: any[] }> => {
-  const prodId = product.id ? Number(product.id) || 1 : 1;
-
   if (options?.isOffline) {
     const queued = await AsyncStorage.getItem(STORAGE_KEYS.OFFLINE_QUEUE);
     const queue = queued ? JSON.parse(queued) : [];
     queue.push({ type: 'publish_product', payload: product, timestamp: new Date().toISOString() });
     await AsyncStorage.setItem(STORAGE_KEYS.OFFLINE_QUEUE, JSON.stringify(queue));
-    return { id: prodId, productId: String(prodId), published: false };
+    return { id: product.id || 'offline', productId: String(product.id || 'offline'), published: false };
   }
 
+  let prodId = product.id ? Number(product.id) : undefined;
+  if (!prodId || isNaN(prodId)) {
+    try {
+      const created = await createProduct({
+        name: product.name || 'Handcrafted Craft Item',
+        description: product.description || 'Authentic traditional Indian craft.',
+        category: product.category || 'Handicrafts',
+        material: product.material,
+        craftType: product.craftType,
+        price: product.price || 1500,
+        quantity: product.quantity || 10,
+        images: product.images,
+      });
+      prodId = created?.id;
+    } catch (createErr: any) {
+      console.warn('[API] Create product before publish failed:', createErr.message);
+    }
+  }
+
+  const finalId = prodId || 1;
   try {
-    const res = await apiRequest<{ queued: boolean; results: any[] }>(
-      `/api/products/${prodId}/publish`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ marketplaces: ['ONDC', 'GEM', 'AMAZON'] }),
-      }
+    const res = await apiClient.post<any>(
+      `/api/products/${finalId}/publish`,
+      { marketplaces: ['ONDC', 'GEM', 'AMAZON_SAHELI'] }
     );
     return {
-      id: prodId,
-      productId: String(prodId),
+      id: finalId,
+      productId: String(finalId),
       published: true,
-      results: res.results,
+      results: res?.results,
     };
   } catch (err: any) {
     console.warn('[API] Publish everywhere fallback:', err.message);
-    return { id: prodId, productId: String(prodId), published: true };
+    return { id: finalId, productId: String(finalId), published: true };
   }
 };
 
@@ -1139,17 +1132,53 @@ export const getBuyerRequestById = async (id: string): Promise<any> => {
   return list.find((r) => r.id === id) || BUYER_REQUEST;
 };
 
-export const getOrders = async (options?: { simulateEmpty?: boolean }): Promise<any[]> => {
+export const getOrders = async (options?: { asBuyer?: boolean; simulateEmpty?: boolean; signal?: AbortSignal }): Promise<any[]> => {
   if (options?.simulateEmpty) return [];
-  return [{ ...ORDER, id: 'ORD-1001' }];
+  try {
+    const endpoint = options?.asBuyer ? '/api/orders/buyer' : '/api/orders';
+    const res = await apiClient.get<any>(endpoint, { signal: options?.signal });
+    const list = res?.orders || (Array.isArray(res) ? res : []);
+    if (Array.isArray(list) && list.length > 0) {
+      return list;
+    }
+  } catch (e: any) {
+    if (e.name === 'AbortError') throw e;
+    console.warn('[API] getOrders error:', e.message);
+  }
+  return options?.simulateEmpty ? [] : [{ ...ORDER, id: '1' }];
 };
 
-export const getOrderById = async (id: string): Promise<any> => {
-  return { ...ORDER, id };
+export const getOrderById = async (id: string | number, options?: { signal?: AbortSignal }): Promise<any> => {
+  try {
+    const res = await apiClient.get<any>(`/api/orders/${id}`, { signal: options?.signal });
+    if (res && (res.order || res.id)) {
+      return res.order || res;
+    }
+  } catch (e: any) {
+    if (e.name === 'AbortError') throw e;
+    console.warn('[API] getOrderById error:', e.message);
+  }
+  return { ...ORDER, id: String(id) };
 };
 
-export const updateOrderStatus = async (orderId: string, status: string): Promise<{ id: string; success: boolean }> => {
-  return { id: orderId, success: true };
+export const updateOrderStatus = async (orderId: string | number, status: string): Promise<{ id: string; success: boolean }> => {
+  try {
+    await apiClient.patch(`/api/orders/${orderId}/status`, { status });
+    return { id: String(orderId), success: true };
+  } catch (e: any) {
+    console.warn('[API] updateOrderStatus error:', e.message);
+    throw e;
+  }
+};
+
+export const createOrder = async (orderData: {
+  productId: number;
+  quantity: number;
+  deliveryAddress?: string;
+  notes?: string;
+}): Promise<any> => {
+  const res = await apiClient.post<any>('/api/orders', orderData);
+  return res?.order || res;
 };
 
 export const sendOffer = async (offer: {
@@ -1242,12 +1271,42 @@ export const flushOfflineQueue = async (
   await AsyncStorage.removeItem(STORAGE_KEYS.OFFLINE_QUEUE);
 };
 
-export const getArtisanProfile = async (): Promise<typeof ARTISAN> => {
+export const getArtisanProfile = async (options?: { signal?: AbortSignal }): Promise<any> => {
+  try {
+    const res = await apiClient.get<any>('/api/artisans/me', { signal: options?.signal });
+    if (res && (res.id || res.name)) {
+      const profile = {
+        ...ARTISAN,
+        ...res,
+        crafts: Array.isArray(res.crafts) ? res.crafts : [res.craftType || 'Handicrafts'],
+      };
+      await AsyncStorage.setItem('@shilpsetu_artisan_profile', JSON.stringify(profile));
+      return profile;
+    }
+  } catch (e: any) {
+    if (e.name === 'AbortError') throw e;
+    console.warn('[API] getArtisanProfile live fetch error:', e.message);
+  }
   try {
     const saved = await AsyncStorage.getItem('@shilpsetu_artisan_profile');
     if (saved) return JSON.parse(saved);
   } catch (e) {}
   return ARTISAN;
+};
+
+export const getCurrentUser = async (options?: { signal?: AbortSignal }): Promise<any> => {
+  try {
+    const res = await apiClient.get<any>('/api/users/me', { signal: options?.signal });
+    if (res && (res.id || res.name)) return res;
+  } catch (e: any) {
+    if (e.name === 'AbortError') throw e;
+    console.warn('[API] getCurrentUser error:', e.message);
+  }
+  return null;
+};
+
+export const updateUserProfile = async (data: { name?: string; language?: string }): Promise<any> => {
+  return apiClient.patch('/api/users/me', data);
 };
 
 export const getAIInsights = async (): Promise<any[]> => {

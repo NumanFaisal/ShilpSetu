@@ -1,15 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Settings, HelpCircle, ChevronRight, LogOut, Star } from 'lucide-react-native';
 import { Header } from '../../components/ui/Header';
 import { useAppStore } from '../../store/useAppStore';
+import { getCurrentUser } from '../../services/api';
 import { BUYER } from '../../mocks/seed';
 
 export default function BuyerProfileScreen() {
   const { logout } = useAppStore();
-  const buyer = BUYER;
+  const [buyer, setBuyerData] = useState(BUYER);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    getCurrentUser({ signal: controller.signal })
+      .then((data) => {
+        if (data && (data.buyer || data.buyerProfile)) {
+          const b = data.buyer || data.buyerProfile;
+          setBuyerData({
+            ...BUYER,
+            companyName: b.companyName || data.name || BUYER.companyName,
+            location: b.location || BUYER.location,
+            totalOrders: b.totalOrders ?? BUYER.totalOrders,
+            artisansConnected: b.artisansConnected ?? BUYER.artisansConnected,
+            activeRequests: b.activeRequests ?? BUYER.activeRequests,
+            bio: b.bio || BUYER.bio,
+            preferences: b.preferences || BUYER.preferences,
+          });
+        }
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') console.warn('[BuyerProfile] Error:', err.message);
+      });
+    return () => controller.abort();
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    router.replace('/welcome');
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF8F6' }}>

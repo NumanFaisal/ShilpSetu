@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Plus } from 'lucide-react-native';
@@ -16,18 +16,29 @@ type Filter = typeof FILTERS[number];
 export default function MyProductsScreen() {
   const { simulateEmptyProducts } = useAppStore();
   const [filter, setFilter] = useState<Filter>('All');
-  const [products, setProducts] = useState(SAMPLE_PRODUCTS as any[]);
-  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadProducts = async () => {
-    setLoading(true);
-    const data = await getMyProducts({ simulateEmpty: simulateEmptyProducts });
-    setProducts(data as any[]);
-    setLoading(false);
+  const loadProducts = async (signal?: AbortSignal) => {
+    try {
+      const data = await getMyProducts({ simulateEmpty: simulateEmptyProducts, signal });
+      setProducts(data as any[]);
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        console.warn('[MyProducts] Fetch error:', err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { loadProducts(); }, [simulateEmptyProducts]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    loadProducts(controller.signal);
+    return () => controller.abort();
+  }, [simulateEmptyProducts]);
 
   const filtered = filter === 'All' ? products : products.filter((p) => p.status === filter.toLowerCase());
 
@@ -62,7 +73,12 @@ export default function MyProductsScreen() {
       </ScrollView>
 
       {/* Product list */}
-      {filtered.length === 0 ? (
+      {loading && !refreshing ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60 }}>
+          <ActivityIndicator size="large" color="#B5502F" />
+          <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 13, color: '#8A726B', marginTop: 12 }}>Loading your products...</Text>
+        </View>
+      ) : filtered.length === 0 ? (
         <EmptyState
           icon="🧺"
           title="No products yet"
