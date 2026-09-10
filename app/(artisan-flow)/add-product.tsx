@@ -1,28 +1,65 @@
 import React from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Camera, Image as ImageIcon } from 'lucide-react-native';
 import { Header } from '../../components/ui/Header';
 import { ShuttleIcon, PotterWheelIcon, LeafIcon } from '../../components/icons/CraftIcons';
 
-const OPTIONS = [
-  {
-    icon: Camera,
-    title: 'Take New Photos',
-    subtitle: 'Use your camera to photograph the product. AI will enhance and remove background.',
-    action: () => router.push('/(artisan-flow)/camera'),
-    primary: true,
-  },
-  {
-    icon: ImageIcon,
-    title: 'Use Existing Photos',
-    subtitle: 'Pick photos from your gallery. AI will process and optimise them.',
-    action: () => router.push('/(artisan-flow)/image-processing'),
-    primary: false,
-  },
-];
+import * as ImagePicker from 'expo-image-picker';
+import { useAppStore } from '../../store/useAppStore';
 
 export default function AddProductScreen() {
+  const updateDraftProduct = useAppStore((s) => s.updateDraftProduct);
+
+  const handlePickFromGallery = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsMultipleSelection: true,
+        selectionLimit: 5,
+        quality: 0.85,
+        base64: true,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const photos = result.assets.map((asset) => {
+          if (asset.base64) {
+            return `data:image/jpeg;base64,${asset.base64}`;
+          }
+          return asset.uri;
+        }).filter(Boolean);
+
+        updateDraftProduct({ images: photos });
+
+        router.push({
+          pathname: '/(artisan-flow)/image-processing',
+          params: { uris: JSON.stringify(photos) },
+        });
+      }
+    } catch (err: any) {
+      console.warn('[AddProduct] Gallery pick error:', err?.message || err);
+      // Fallback navigate to image-processing screen
+      router.push('/(artisan-flow)/image-processing');
+    }
+  };
+
+  const OPTIONS = [
+    {
+      icon: Camera,
+      title: 'Take New Photos',
+      subtitle: 'Use your camera to photograph the product. AI will enhance and remove background.',
+      action: () => router.push('/(artisan-flow)/camera'),
+      primary: true,
+    },
+    {
+      icon: ImageIcon,
+      title: 'Use Existing Photos',
+      subtitle: 'Pick photos from your gallery. AI will process and optimise them.',
+      action: handlePickFromGallery,
+      primary: false,
+    },
+  ];
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF8F6' }}>
       <Header title="Add Product" showBack />

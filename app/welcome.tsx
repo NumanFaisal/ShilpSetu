@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, Image, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Button } from '../components/ui/Button';
 import { AIBadge } from '../components/ui/AIBadge';

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity, Animated, Easing } from 'react-native';
+import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAudioRecorder, RecordingPresets, AudioModule, useAudioRecorderState } from 'expo-audio';
 import { Mic, MicOff, ChevronRight, Edit3 } from 'lucide-react-native';
@@ -55,14 +56,18 @@ export default function VoiceDescriptionScreen() {
 
     try {
       await audioRecorder.stop();
-      const uri = audioRecorder.uri;
-      if (!uri) throw new Error('Recording produced no file');
+      let uri = audioRecorder.uri;
+      if (!uri) {
+        await new Promise((r) => setTimeout(r, 250));
+        uri = audioRecorder.uri;
+      }
+      if (!uri) throw new Error('Recording produced no audio file. Please try recording again.');
 
       const result = await processVoice(uri, { simulateError: simulateAIError });
       setTranscription(result.transcription);
       setAttributes(result.extractedAttributes as Record<string, string>);
       updateDraftProduct({
-        name: result.extractedAttributes.productName || '',
+        name: result.extractedAttributes.productName || 'Handcrafted Artisan Product',
         material: result.extractedAttributes.material || '',
         description: result.transcription,
         craftType: result.extractedAttributes.craftType || '',

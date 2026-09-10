@@ -40,13 +40,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     else router.push(`/(buyer)/product/${id}` as any);
   };
 
-  const statusConfig = {
+  const statusConfig: Record<string, { label: string; bg: string; text: string }> = {
     active: { label: 'Active', bg: 'rgba(91,110,78,0.1)', text: '#5B6E4E' },
+    published: { label: 'Published', bg: 'rgba(91,110,78,0.1)', text: '#5B6E4E' },
+    completed: { label: 'Active', bg: 'rgba(91,110,78,0.1)', text: '#5B6E4E' },
     draft: { label: 'Draft', bg: 'rgba(138,114,107,0.1)', text: '#8A726B' },
     archived: { label: 'Archived', bg: 'rgba(43,36,32,0.08)', text: '#56423C' },
+    pending: { label: 'Pending', bg: 'rgba(181,80,47,0.1)', text: '#B5502F' },
   };
 
-  const sc = statusConfig[status];
+  const norm = String(status || 'active').toLowerCase();
+  const sc = statusConfig[norm] || {
+    label: norm.charAt(0).toUpperCase() + norm.slice(1),
+    bg: 'rgba(91,110,78,0.1)',
+    text: '#5B6E4E',
+  };
 
   return (
     <TouchableOpacity
@@ -64,7 +72,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Product Image */}
       {images.length > 0 && (
         <Image
-          source={{ uri: images[0] }}
+          source={{ uri: typeof images[0] === 'string' ? images[0] : (images[0] as any)?.uri || (images[0] as any)?.url || '' }}
           style={{ width: '100%', height: 180, backgroundColor: '#F8EAE4' }}
           resizeMode="cover"
         />

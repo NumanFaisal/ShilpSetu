@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../../../components/ui/Header';
 import { BuyerCard } from '../../../components/ui/BuyerCard';
 import { EmptyState } from '../../../components/ui/EmptyState';
@@ -10,7 +11,7 @@ import { BUYER_REQUESTS_LIST } from '../../../mocks/seed';
 
 export default function FindBuyersScreen() {
   const [requests, setRequests] = useState(BUYER_REQUESTS_LIST as any[]);
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false); useEffect(() => { onRefresh(); }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -60,3 +61,4 @@ export default function FindBuyersScreen() {
     </SafeAreaView>
   );
 }
+
