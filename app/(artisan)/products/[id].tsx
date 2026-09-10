@@ -1,17 +1,56 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Share2, Archive, MessageCircle, ChevronRight } from 'lucide-react-native';
 import { Header } from '../../../components/ui/Header';
 import { AIBadge } from '../../../components/ui/AIBadge';
 import { Button } from '../../../components/ui/Button';
+import { getProductById, deleteProduct } from '../../../services/api';
 import { PRODUCT, BUYER_REQUEST } from '../../../mocks/seed';
 
 export default function ArtisanProductDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const product = PRODUCT; // In real app: fetch by id
+  const [product, setProduct] = useState<any>(PRODUCT);
+  const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+
+  useEffect(() => {
+    if (!id) return;
+    const controller = new AbortController();
+    getProductById(id, { signal: controller.signal })
+      .then((data) => {
+        if (data) setProduct(data);
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') console.warn('[ProductDetails] Error:', err.message);
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [id]);
+
+  const handleArchive = () => {
+    Alert.alert(
+      'Archive Product',
+      `Are you sure you want to remove "${product.name}" from your catalog?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Archive',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              if (id) await deleteProduct(id);
+              Alert.alert('Success', 'Product archived successfully.');
+              router.replace('/(artisan)/products');
+            } catch (e: any) {
+              Alert.alert('Error', e.message || 'Failed to archive product.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF8F6' }}>
@@ -26,7 +65,7 @@ export default function ArtisanProductDetailsScreen() {
           />
           {product.images.length > 1 && (
             <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 6, position: 'absolute', bottom: 12, left: 0, right: 0 }}>
-              {product.images.map((_, i) => (
+              {product.images.map((_: any, i: number) => (
                 <TouchableOpacity key={i} onPress={() => setActiveImage(i)}>
                   <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: i === activeImage ? '#B5502F' : 'rgba(255,255,255,0.7)' }} />
                 </TouchableOpacity>
@@ -131,7 +170,11 @@ export default function ArtisanProductDetailsScreen() {
         <TouchableOpacity style={{ width: 44, height: 44, borderRadius: 8, borderWidth: 1, borderColor: '#E4D8C3', alignItems: 'center', justifyContent: 'center' }}>
           <Share2 size={20} color="#2B2420" strokeWidth={1.5} />
         </TouchableOpacity>
-        <TouchableOpacity style={{ width: 44, height: 44, borderRadius: 8, borderWidth: 1, borderColor: '#E4D8C3', alignItems: 'center', justifyContent: 'center' }}>
+        <TouchableOpacity 
+          onPress={handleArchive}
+          accessibilityLabel="Archive product"
+          style={{ width: 44, height: 44, borderRadius: 8, borderWidth: 1, borderColor: '#E4D8C3', alignItems: 'center', justifyContent: 'center' }}
+        >
           <Archive size={20} color="#2B2420" strokeWidth={1.5} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>

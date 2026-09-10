@@ -1,15 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Settings, HelpCircle, Star, ChevronRight, LogOut } from 'lucide-react-native';
 import { Header } from '../../components/ui/Header';
 import { useAppStore } from '../../store/useAppStore';
+import { getArtisanProfile } from '../../services/api';
 import { ARTISAN, SAMPLE_PRODUCTS } from '../../mocks/seed';
 
 export default function ArtisanProfileScreen() {
   const { logout } = useAppStore();
-  const artisan = ARTISAN;
+  const [artisan, setArtisanData] = useState(ARTISAN);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    getArtisanProfile({ signal: controller.signal })
+      .then((data) => {
+        if (data) setArtisanData(data);
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') console.warn('[ArtisanProfile] Error:', err.message);
+      });
+    return () => controller.abort();
+  }, []);
 
   const handleLogout = () => {
     logout();

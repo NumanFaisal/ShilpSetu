@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Search as SearchIcon, LayoutGrid } from 'lucide-react-native';
@@ -11,19 +11,66 @@ import { DISCOVER_PRODUCTS, CRAFT_CATEGORIES } from '../../mocks/seed';
 
 export default function BuyerDiscoverScreen() {
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [products, setProducts] = useState(DISCOVER_PRODUCTS as any[]); React.useEffect(() => { getDiscoverProducts().then(res => setProducts(res as any[])); }, []);
+  const [products, setProducts] = useState<any[]>(DISCOVER_PRODUCTS as any[]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const handleSearch = async (q: string) => {
-    setSearch(q);
-    const result = await getDiscoverProducts({ category: selectedCategory, search: q });
-    setProducts(result as any[]);
-  };
+  // Debounce search input by 300ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-  const handleCategorySelect = async (id: string) => {
-    setSelectedCategory(id);
-    const result = await getDiscoverProducts({ category: id, search });
-    setProducts(result as any[]);
+  // Fetch products with AbortController whenever category or debouncedSearch changes
+  useEffect(() => {
+    const controller = new AbortController();
+    let isMounted = true;
+    setLoading(true);
+
+    async function load() {
+      try {
+        const res = await getDiscoverProducts({
+          category: selectedCategory,
+          search: debouncedSearch,
+          signal: controller.signal,
+        });
+        if (isMounted) {
+          setProducts(res || []);
+        }
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          console.warn('[BuyerDiscoverScreen] fetch error:', err.message);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    load();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [selectedCategory, debouncedSearch]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const res = await getDiscoverProducts({
+        category: selectedCategory,
+        search: debouncedSearch,
+      });
+      setProducts(res || []);
+    } catch (e: any) {
+      console.warn('[BuyerDiscoverScreen] refresh error:', e.message);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   return (
@@ -48,7 +95,7 @@ export default function BuyerDiscoverScreen() {
           <SearchIcon size={18} color="#8A726B" strokeWidth={1.5} />
           <TextInput
             value={search}
-            onChangeText={handleSearch}
+            onChangeText={setSearch}
             placeholder="Search crafts, materials, regions..."
             placeholderTextColor="#B8A9A5"
             style={{ flex: 1, fontFamily: 'Inter_400Regular', fontSize: 15, color: '#2B2420' }}
@@ -72,7 +119,7 @@ export default function BuyerDiscoverScreen() {
         >
           {/* 'All Categories' Chip */}
           <TouchableOpacity
-            onPress={() => handleCategorySelect('all')}
+            onPress={() => setSelectedCategory('all')}
             activeOpacity={0.8}
             style={{
               flexDirection: 'row',
@@ -105,7 +152,7 @@ export default function BuyerDiscoverScreen() {
             return (
               <TouchableOpacity
                 key={cat.id}
-                onPress={() => handleCategorySelect(cat.id)}
+                onPress={() => setSelectedCategory(cat.id)}
                 activeOpacity={0.8}
                 style={{
                   flexDirection: 'row',
@@ -136,33 +183,42 @@ export default function BuyerDiscoverScreen() {
       </View>
 
       {/* Product List */}
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
-        {products.length === 0 ? (
-          <View style={{ alignItems: 'center', paddingVertical: 60, gap: 12 }}>
-            <Text style={{ fontSize: 36 }}>🔍</Text>
-            <Text style={{ fontFamily: 'Fraunces_600SemiBold', fontSize: 20, color: '#2B2420' }}>No products found</Text>
-            <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 14, color: '#56423C', textAlign: 'center' }}>
-              Try selecting another category or refining your search keywords.
-            </Text>
-          </View>
-        ) : (
-          products.map((p: any) => (
-            <ProductCard
-              key={p.id}
-              id={p.id}
-              name={p.name}
-              price={p.price}
-              category={p.category}
-              images={p.images || []}
-              matchScore={p.matchScore}
-              origin={p.origin}
-              variant="discover"
-              onPress={() => router.push(`/(buyer)/product/${p.id}` as any)}
-            />
-          ))
-        )}
-      </ScrollView>
+      {loading && products.length === 0 ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#B5502F" />
+        </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#B5502F" />}
+        >
+          {products.length === 0 ? (
+            <View style={{ alignItems: 'center', paddingVertical: 60, gap: 12 }}>
+              <Text style={{ fontSize: 36 }}>🔍</Text>
+              <Text style={{ fontFamily: 'Fraunces_600SemiBold', fontSize: 20, color: '#2B2420' }}>No products found</Text>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 14, color: '#56423C', textAlign: 'center' }}>
+                Try selecting another category or refining your search keywords.
+              </Text>
+            </View>
+          ) : (
+            products.map((p: any) => (
+              <ProductCard
+                key={p.id}
+                id={String(p.id)}
+                name={p.name}
+                price={p.price}
+                category={p.category}
+                images={Array.isArray(p.images) ? p.images : []}
+                matchScore={p.matchScore}
+                origin={p.origin}
+                variant="discover"
+                onPress={() => router.push(`/(buyer)/product/${p.id}` as any)}
+              />
+            ))
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
-
