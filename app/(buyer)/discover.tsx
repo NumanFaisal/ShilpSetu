@@ -12,7 +12,7 @@ import { DISCOVER_PRODUCTS, CRAFT_CATEGORIES } from '../../mocks/seed';
 export default function BuyerDiscoverScreen() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [products, setProducts] = useState(DISCOVER_PRODUCTS as any[]);
+  const [products, setProducts] = useState(DISCOVER_PRODUCTS as any[]); React.useEffect(() => { getDiscoverProducts().then(res => setProducts(res as any[])); }, []);
 
   const handleSearch = async (q: string) => {
     setSearch(q);
@@ -165,3 +165,4 @@ export default function BuyerDiscoverScreen() {
     </SafeAreaView>
   );
 }
+

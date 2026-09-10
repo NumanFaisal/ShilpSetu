@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, SafeAreaView } from 'react-native';
+import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { AIProcessingScreen } from '../../components/ui/WeavingThreadLoader';
 import { generateCatalog } from '../../services/api';

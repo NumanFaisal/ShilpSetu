@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { Header } from '../components/ui/Header';

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, RefreshControl } from 'react-native';
+import { ScrollView, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Header } from '../../../components/ui/Header';
 import { OrderCard } from '../../../components/ui/OrderCard';

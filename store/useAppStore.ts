@@ -125,7 +125,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     const updated = { ...get().draftProduct, ...data };
     set({ draftProduct: updated });
     try {
-      AsyncStorage.setItem('@shilpsetu_draft', JSON.stringify(updated)).catch((e) =>
+      // Sanitize: do not write multi-megabyte base64 strings into SQLite AsyncStorage
+      // Keep only file URIs (file://...) or remote URLs (http...) to avoid CursorWindow 2MB limits
+      const sanitized = {
+        ...updated,
+        images: (updated.images || [])
+          .map((img) => (typeof img === 'string' && img.startsWith('data:') ? '' : img))
+          .filter(Boolean),
+      };
+      AsyncStorage.setItem('@shilpsetu_draft', JSON.stringify(sanitized)).catch((e) =>
         console.error('Failed to save draft product:', e)
       );
     } catch (e) {
@@ -179,44 +187,72 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   loadPersistedState: async () => {
     try {
-      const [role, token, lang, draft, queue] = await AsyncStorage.multiGet([
-        '@shilpsetu_role',
-        '@shilpsetu_token',
-        '@shilpsetu_lang',
-        '@shilpsetu_draft',
-        '@shilpsetu_queue',
-      ]);
+      // First load core auth and settings keys that are always small
+      let roleVal: string | null = null;
+      let tokenVal: string | null = null;
+      let langVal: string | null = null;
+      let queueVal: string | null = null;
+
+      try {
+        const [role, token, lang, queue] = await AsyncStorage.multiGet([
+          '@shilpsetu_role',
+          '@shilpsetu_token',
+          '@shilpsetu_lang',
+          '@shilpsetu_queue',
+        ]);
+        roleVal = role?.[1] || null;
+        tokenVal = token?.[1] || null;
+        langVal = lang?.[1] || null;
+        queueVal = queue?.[1] || null;
+      } catch {
+        roleVal = await AsyncStorage.getItem('@shilpsetu_role').catch(() => null);
+        tokenVal = await AsyncStorage.getItem('@shilpsetu_token').catch(() => null);
+        langVal = await AsyncStorage.getItem('@shilpsetu_lang').catch(() => null);
+        queueVal = await AsyncStorage.getItem('@shilpsetu_queue').catch(() => null);
+      }
+
+      // Safely load draftProduct with CursorWindow overflow protection
+      let draftVal: string | null = null;
+      try {
+        draftVal = await AsyncStorage.getItem('@shilpsetu_draft');
+      } catch (cursorErr: any) {
+        console.warn('Oversized @shilpsetu_draft found in SQLite, clearing to avoid CursorWindow overflow');
+        await AsyncStorage.removeItem('@shilpsetu_draft').catch(() => {});
+      }
 
       const updates: Partial<AppState> = {};
-      if (role[1]) {
-        updates.userRole = role[1] as UserRole;
+      if (roleVal) {
+        updates.userRole = roleVal as UserRole;
         updates.isAuthenticated = true;
-        // Re-seed the user data from mock
-        if (role[1] === 'artisan') updates.artisan = ARTISAN as typeof ARTISAN;
-        if (role[1] === 'buyer') updates.buyer = BUYER as typeof BUYER;
+        if (roleVal === 'artisan') updates.artisan = ARTISAN as typeof ARTISAN;
+        if (roleVal === 'buyer') updates.buyer = BUYER as typeof BUYER;
       }
-      if (token[1]) updates.authToken = token[1];
-      if (lang[1]) updates.selectedLanguage = lang[1];
-      
-      if (draft[1]) {
+      if (tokenVal) updates.authToken = tokenVal;
+      if (langVal) updates.selectedLanguage = langVal;
+
+      if (draftVal) {
         try {
-          updates.draftProduct = JSON.parse(draft[1]);
+          updates.draftProduct = JSON.parse(draftVal);
         } catch (e) {
           console.warn('Failed to parse draft product JSON:', e);
         }
       }
-      
-      if (queue[1]) {
+
+      if (queueVal) {
         try {
-          updates.offlineQueue = JSON.parse(queue[1]);
+          updates.offlineQueue = JSON.parse(queueVal);
         } catch (e) {
           console.warn('Failed to parse offline queue JSON:', e);
         }
       }
 
       set(updates);
-    } catch (e) {
-      console.warn('Failed to load persisted state:', e);
+    } catch (e: any) {
+      console.warn('Failed to load persisted state:', e?.message || e);
+      // Clean up corrupted draft if CursorWindow error persists
+      if (String(e?.message).includes('CursorWindow')) {
+        await AsyncStorage.removeItem('@shilpsetu_draft').catch(() => {});
+      }
     }
   },
 }));
