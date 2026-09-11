@@ -248,7 +248,7 @@ export default function ImageProcessingScreen() {
 
     console.log(`[ImageProcessing] Starting background polling for batch ${batchId} (${processedImages.length}/${expectedCount} images ready)...`);
     let attempts = 0;
-    const maxAttempts = 30;
+    const maxAttempts = 35;
 
     pollTimerRef.current = setInterval(async () => {
       attempts++;
@@ -256,7 +256,7 @@ export default function ImageProcessingScreen() {
       if (success || attempts >= maxAttempts) {
         clearInterval(pollTimerRef.current);
       }
-    }, 2000);
+    }, 1200);
 
     return () => {
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
@@ -269,7 +269,7 @@ export default function ImageProcessingScreen() {
         mediaTypes: ['images'],
         allowsMultipleSelection: true,
         selectionLimit: 5,
-        quality: 0.85,
+        quality: 0.65,
         base64: true,
       });
       if (!result.canceled && result.assets) {
