@@ -730,13 +730,13 @@ export const processImages = async (
       if (data && data.batchId) {
         batchId = data.batchId;
 
-        // Poll batch status up to 60 times (1.2s interval = ~72s ceiling) to wait for all AI outputs
+        // Poll batch status up to 20 times (1.0s interval) to wait for AI outputs
         const targetCount = imageUris.length;
-        for (let i = 0; i < 60; i++) {
-          await new Promise((resolve) => setTimeout(resolve, 1200));
+        for (let i = 0; i < 20; i++) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
           try {
             const batchDetails = await apiRequest<any>(`/api/image-batches/${batchId}`, {}, true);
-            console.log(`[API] Polling batch ${batchId} [attempt ${i + 1}/60] status: ${batchDetails?.status}`);
+            console.log(`[API] Polling batch ${batchId} [attempt ${i + 1}/20] status: ${batchDetails?.status}`);
 
             if (batchDetails?.images?.length > 0) {
               const remoteUrls = batchDetails.images

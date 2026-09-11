@@ -248,7 +248,7 @@ export default function ImageProcessingScreen() {
 
     console.log(`[ImageProcessing] Starting background polling for batch ${batchId} (${processedImages.length}/${expectedCount} images ready)...`);
     let attempts = 0;
-    const maxAttempts = 35;
+    const maxAttempts = 20;
 
     pollTimerRef.current = setInterval(async () => {
       attempts++;
@@ -256,7 +256,7 @@ export default function ImageProcessingScreen() {
       if (success || attempts >= maxAttempts) {
         clearInterval(pollTimerRef.current);
       }
-    }, 1200);
+    }, 1000);
 
     return () => {
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
