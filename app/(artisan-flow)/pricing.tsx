@@ -55,10 +55,13 @@ export default function PricingScreen() {
     updateDraftProduct({ price: numericPrice });
 
     try {
-      await publishProduct({
+      const res = await publishProduct({
         ...draftProduct,
         price: numericPrice,
       });
+      if (res?.productId) {
+        updateDraftProduct({ id: res.productId } as any);
+      }
     } catch (err) {
       console.warn('[Pricing] Publish sync offline fallback:', err);
     } finally {

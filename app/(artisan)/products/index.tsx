@@ -8,7 +8,6 @@ import { ProductCard } from '../../../components/ui/ProductCard';
 import { EmptyState } from '../../../components/ui/EmptyState';
 import { getMyProducts } from '../../../services/api';
 import { useAppStore } from '../../../store/useAppStore';
-import { SAMPLE_PRODUCTS } from '../../../mocks/seed';
 
 const FILTERS = ['All', 'Active', 'Draft', 'Archived'] as const;
 type Filter = typeof FILTERS[number];
@@ -40,7 +39,13 @@ export default function MyProductsScreen() {
     return () => controller.abort();
   }, [simulateEmptyProducts]);
 
-  const filtered = filter === 'All' ? products : products.filter((p) => p.status === filter.toLowerCase());
+  const filtered = filter === 'All'
+    ? products
+    : products.filter((p) => {
+        const s = (p.status || '').toLowerCase();
+        if (filter === 'Active') return s === 'active' || s === 'published' || s === 'completed';
+        return s === filter.toLowerCase();
+      });
 
   const onRefresh = async () => {
     setRefreshing(true);

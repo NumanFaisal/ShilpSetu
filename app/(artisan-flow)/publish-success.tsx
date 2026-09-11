@@ -27,9 +27,12 @@ export default function PublishSuccessScreen() {
       addOfflineWrite({ id: Date.now().toString(), type: 'publish_product', payload: draftProduct as any, timestamp: new Date().toISOString() });
       return;
     }
+    if ((draftProduct as any)?.id) {
+      // Already published in pricing.tsx
+      return;
+    }
     try {
       await publishProduct(draftProduct as any);
-      clearDraftProduct();
     } catch {
       // Still show success — will retry from queue
     }
