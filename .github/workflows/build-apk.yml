@@ -26,13 +26,12 @@ jobs:
       - name: Generate Native Android Project (Expo Prebuild)
         run: npx expo prebuild --platform android --clean
 
-      # 2. Now setup Java and cache gradle files (which now exist)
+      # 2. Setup Java JDK 17 (Clean build without corrupted cache)
       - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Install Android NDK 27.1.12297006
         run: |
@@ -64,7 +63,7 @@ jobs:
           ORG_GRADLE_PROJECT_MYAPP_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           cd android
-          ./gradlew assembleRelease --no-daemon --stacktrace -x lint -x test
+          ./gradlew assembleRelease --no-daemon --no-build-cache --stacktrace -x lint -x test
 
       - name: Rename and Verify APK Signature & Release Flag
         run: |
