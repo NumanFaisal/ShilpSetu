@@ -27,7 +27,10 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
         "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE"
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ]
     },
     "web": {
@@ -76,9 +79,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "85123583-d58f-40d7-ab9d-ea1337d51f3a"
+        "projectId": "97391842-d23d-4f7b-ac5c-34b322043e19"
       },
-      "apiUrl": "http://192.168.1.13:5001"
+      "apiUrl": "https://shilpsetu-backend-t5a1.onrender.com"
     }
   }
 }
