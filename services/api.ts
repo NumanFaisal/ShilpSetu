@@ -517,7 +517,7 @@ export const getMyProducts = async (options?: { simulateEmpty?: boolean; signal?
   try {
     const res = await apiClient.get<any>('/api/products', { signal: options?.signal });
     const list = res?.products || (Array.isArray(res) ? res : []);
-    if (Array.isArray(list) && list.length > 0) {
+    if (Array.isArray(list)) {
       return list.map((p) => ({
         ...p,
         id: String(p.id),
@@ -527,13 +527,24 @@ export const getMyProducts = async (options?: { simulateEmpty?: boolean; signal?
     if (e.name === 'AbortError') throw e;
     console.warn('[API] getMyProducts error:', e.message);
   }
-  return options?.simulateEmpty ? [] : SAMPLE_PRODUCTS;
+  return [];
 };
 
 export const getProductById = async (id: string, options?: { signal?: AbortSignal }): Promise<any> => {
   try {
     const numId = Number(id);
     if (!isNaN(numId)) {
+      try {
+        const mine = await apiClient.get<any>(`/api/products/${numId}`, { signal: options?.signal });
+        const product = mine?.product || mine;
+        if (product && product.id) {
+          return {
+            ...product,
+            id: String(product.id),
+          };
+        }
+      } catch {}
+
       const p = await apiClient.get<any>(`/api/marketplace/products/${numId}`, { signal: options?.signal, skipAuth: true });
       const product = p?.product || p;
       if (product && product.id) {
@@ -547,8 +558,7 @@ export const getProductById = async (id: string, options?: { signal?: AbortSigna
     if (e.name === 'AbortError') throw e;
     console.warn('[API] getProductById live fetch error:', e.message);
   }
-  const found = SAMPLE_PRODUCTS.find((p) => String(p.id) === String(id)) || PRODUCT;
-  return found;
+  return null;
 };
 
 export const getDiscoverProducts = async (filters?: {
@@ -730,13 +740,13 @@ export const processImages = async (
       if (data && data.batchId) {
         batchId = data.batchId;
 
-        // Poll batch status up to 30 times (1.5s interval = ~45s) to wait for all AI outputs
+        // Poll batch status up to 20 times (1.0s interval) to wait for AI outputs
         const targetCount = imageUris.length;
-        for (let i = 0; i < 45; i++) {
-          await new Promise((resolve) => setTimeout(resolve, 1500));
+        for (let i = 0; i < 20; i++) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
           try {
             const batchDetails = await apiRequest<any>(`/api/image-batches/${batchId}`, {}, true);
-            console.log(`[API] Polling batch ${batchId} [attempt ${i + 1}/45] status: ${batchDetails?.status}`);
+            console.log(`[API] Polling batch ${batchId} [attempt ${i + 1}/20] status: ${batchDetails?.status}`);
 
             if (batchDetails?.images?.length > 0) {
               const remoteUrls = batchDetails.images

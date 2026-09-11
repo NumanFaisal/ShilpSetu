@@ -47,7 +47,7 @@ export default function CameraScreen() {
     try {
       setIsCapturing(true);
       const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.85,
+        quality: 0.65,
         base64: true,
         skipProcessing: false,
       });
@@ -82,7 +82,7 @@ export default function CameraScreen() {
         mediaTypes: ['images'],
         allowsMultipleSelection: true,
         selectionLimit: 5 - photos.length,
-        quality: 0.85,
+        quality: 0.65,
         base64: true,
       });
 

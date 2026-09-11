@@ -5,12 +5,13 @@ import { router } from 'expo-router';
 import { Settings, HelpCircle, Star, ChevronRight, LogOut } from 'lucide-react-native';
 import { Header } from '../../components/ui/Header';
 import { useAppStore } from '../../store/useAppStore';
-import { getArtisanProfile } from '../../services/api';
-import { ARTISAN, SAMPLE_PRODUCTS } from '../../mocks/seed';
+import { getArtisanProfile, getMyProducts } from '../../services/api';
+import { ARTISAN } from '../../mocks/seed';
 
 export default function ArtisanProfileScreen() {
   const { logout } = useAppStore();
   const [artisan, setArtisanData] = useState(ARTISAN);
+  const [products, setProducts] = useState<any[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -21,6 +22,13 @@ export default function ArtisanProfileScreen() {
       .catch((err) => {
         if (err.name !== 'AbortError') console.warn('[ArtisanProfile] Error:', err.message);
       });
+
+    getMyProducts({ signal: controller.signal })
+      .then((prods) => {
+        if (Array.isArray(prods)) setProducts(prods);
+      })
+      .catch(() => {});
+
     return () => controller.abort();
   }, []);
 
@@ -33,6 +41,12 @@ export default function ArtisanProfileScreen() {
     { icon: Settings, label: 'Settings', onPress: () => router.push('/settings') },
     { icon: HelpCircle, label: 'Help & Support', onPress: () => router.push('/help') },
   ];
+
+  const portfolioImages: string[] = (
+    Array.isArray(artisan.portfolio) && artisan.portfolio.length > 0
+      ? artisan.portfolio
+      : products.flatMap((p) => p.images || []).filter(Boolean)
+  ).filter((img: any) => typeof img === 'string' && (img.startsWith('http') || img.startsWith('file:') || img.startsWith('data:')));
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF8F6' }}>
@@ -55,7 +69,7 @@ export default function ArtisanProfileScreen() {
 
           {/* Craft tags */}
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
-            {artisan.crafts.map((craft) => (
+            {(artisan.crafts || []).map((craft) => (
               <View key={craft} style={{ paddingHorizontal: 12, paddingVertical: 4, borderRadius: 9999, backgroundColor: 'rgba(181,80,47,0.08)', borderWidth: 1, borderColor: '#B5502F' }}>
                 <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: '#B5502F' }}>{craft}</Text>
               </View>
@@ -66,9 +80,9 @@ export default function ArtisanProfileScreen() {
         {/* Stats */}
         <View style={{ flexDirection: 'row', marginHorizontal: 20, marginTop: 20, borderRadius: 12, borderWidth: 1, borderColor: '#E4D8C3', overflow: 'hidden' }}>
           {[
-            { value: artisan.productsCount, label: 'Products' },
-            { value: artisan.experience, label: 'Yrs Experience' },
-            { value: artisan.reviewCount, label: 'Reviews' },
+            { value: products.length || artisan.productsCount || 0, label: 'Products' },
+            { value: artisan.experience || 5, label: 'Yrs Experience' },
+            { value: artisan.reviewCount || 0, label: 'Reviews' },
           ].map((stat, i) => (
             <View key={i} style={{ flex: 1, alignItems: 'center', paddingVertical: 16, borderLeftWidth: i > 0 ? 1 : 0, borderLeftColor: '#E4D8C3', backgroundColor: '#FFFDF8' }}>
               <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 20, color: '#B5502F' }}>{stat.value}</Text>
@@ -85,12 +99,39 @@ export default function ArtisanProfileScreen() {
 
         {/* Portfolio preview */}
         <View style={{ marginTop: 20, gap: 12 }}>
-          <Text style={{ fontFamily: 'Fraunces_600SemiBold', fontSize: 16, color: '#2B2420', paddingHorizontal: 20 }}>Portfolio</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}>
-            {SAMPLE_PRODUCTS.filter((p) => p.images.length > 0).map((p) => (
-              <Image key={p.id} source={{ uri: p.images[0] }} style={{ width: 100, height: 100, borderRadius: 10, backgroundColor: '#F6EEDF' }} />
-            ))}
-          </ScrollView>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 }}>
+            <Text style={{ fontFamily: 'Fraunces_600SemiBold', fontSize: 16, color: '#2B2420' }}>Portfolio</Text>
+            {products.length > 0 && (
+              <TouchableOpacity onPress={() => router.push('/(artisan)/products')}>
+                <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 13, color: '#B5502F' }}>View All ({products.length})</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {portfolioImages.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}>
+              {portfolioImages.map((imgUrl, index) => (
+                <Image
+                  key={`${imgUrl}-${index}`}
+                  source={{ uri: imgUrl }}
+                  style={{ width: 100, height: 100, borderRadius: 10, backgroundColor: '#F6EEDF' }}
+                  resizeMode="cover"
+                />
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={{ marginHorizontal: 20, padding: 20, borderRadius: 12, backgroundColor: '#FFFDF8', borderWidth: 1, borderColor: '#E4D8C3', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 14, color: '#2B2420' }}>No products in your portfolio yet</Text>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: '#8A726B', textAlign: 'center' }}>
+                Add your handcrafted products to showcase your craft and receive buyer orders.
+              </Text>
+              <TouchableOpacity
+                onPress={() => router.push('/(artisan-flow)/add-product')}
+                style={{ backgroundColor: '#B5502F', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, marginTop: 4 }}
+              >
+                <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 13, color: '#FFF' }}>Add First Product</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Menu */}

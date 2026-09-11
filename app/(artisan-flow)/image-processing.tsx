@@ -248,7 +248,7 @@ export default function ImageProcessingScreen() {
 
     console.log(`[ImageProcessing] Starting background polling for batch ${batchId} (${processedImages.length}/${expectedCount} images ready)...`);
     let attempts = 0;
-    const maxAttempts = 30;
+    const maxAttempts = 20;
 
     pollTimerRef.current = setInterval(async () => {
       attempts++;
@@ -256,7 +256,7 @@ export default function ImageProcessingScreen() {
       if (success || attempts >= maxAttempts) {
         clearInterval(pollTimerRef.current);
       }
-    }, 2000);
+    }, 1000);
 
     return () => {
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
@@ -269,7 +269,7 @@ export default function ImageProcessingScreen() {
         mediaTypes: ['images'],
         allowsMultipleSelection: true,
         selectionLimit: 5,
-        quality: 0.85,
+        quality: 0.65,
         base64: true,
       });
       if (!result.canceled && result.assets) {
@@ -464,12 +464,12 @@ export default function ImageProcessingScreen() {
       currentEnhancedUri = resolveImageUri(activePhotoOutputs[aspectRatio]);
     }
 
-    const rawActiveUri = isEnhancedMode
+    const rawActiveUri = isEnhancedMode && hasRemoteEnhanced
       ? currentEnhancedUri
-      : originalImages[activePhotoIdx] || originalImages[0] || images[0];
+      : originalImages[activePhotoIdx] || originalImages[0] || images[activePhotoIdx] || images[0];
     const currentUri = resolveImageUri(rawActiveUri);
 
-    const activeList = (isEnhancedMode ? processedImages : originalImages)
+    const activeList = (isEnhancedMode && hasRemoteEnhanced ? processedImages : originalImages.length > 0 ? originalImages : images)
       .map(resolveImageUri)
       .filter(Boolean);
 
@@ -603,51 +603,30 @@ export default function ImageProcessingScreen() {
               alignItems: 'center',
             }}
           >
-            {isEnhancedMode && !hasRemoteEnhanced ? (
-              <View style={{ alignItems: 'center', justifyContent: 'center', padding: 20, gap: 12 }}>
-                <ActivityIndicator size="large" color="#B5502F" />
-                <Text
-                  style={{
-                    fontFamily: 'Inter_600SemiBold',
-                    fontSize: 14,
-                    color: '#2B2420',
-                    textAlign: 'center',
-                  }}
-                >
-                  Rendering Studio Cyclorama & Lighting...
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: 'Inter_400Regular',
-                    fontSize: 12,
-                    color: '#8A726B',
-                    textAlign: 'center',
-                  }}
-                >
-                  Querying backend: /api/image-batches/{batchId?.slice(0, 8)}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => batchId && fetchBatchEnhanced(batchId)}
-                  style={{
-                    marginTop: 8,
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    backgroundColor: '#F5EBE6',
-                    borderRadius: 8,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}
-                >
-                  <RefreshCw size={13} color="#B5502F" />
-                  <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: '#B5502F' }}>
-                    Tap to Check API
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ) : Boolean(currentUri) ? (
+            {Boolean(currentUri) ? (
               <>
                 <Image source={{ uri: currentUri }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
+                {isEnhancedMode && !hasRemoteEnhanced && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: 12,
+                      left: 12,
+                      backgroundColor: 'rgba(43,36,32,0.85)',
+                      borderRadius: 20,
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <ActivityIndicator size="small" color="#E59866" />
+                    <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: '#FFFFFF' }}>
+                      Studio Lighting Rendering...
+                    </Text>
+                  </View>
+                )}
                 <View
                   style={{
                     position: 'absolute',
