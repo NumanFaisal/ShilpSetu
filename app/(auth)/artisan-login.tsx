@@ -161,7 +161,7 @@ export default function ArtisanLoginScreen() {
             <TouchableOpacity
               onPress={() => {
                 setIdentifier('numanfaisal980@gmail.com');
-                setPassword('password123');
+                setPassword('123456');
                 setError('');
               }}
             >

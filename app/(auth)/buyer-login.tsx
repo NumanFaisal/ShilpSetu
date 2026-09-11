@@ -156,8 +156,8 @@ export default function BuyerLoginScreen() {
             </Text>
             <TouchableOpacity
               onPress={() => {
-                setIdentifier('fabindia@fabindia.com');
-                setPassword('password123');
+                setIdentifier('vishal420@gmail.com');
+                setPassword('123456');
                 setError('');
               }}
             >
