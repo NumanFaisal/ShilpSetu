@@ -23,6 +23,7 @@
       },
       "package": "com.shilpsetu.app",
       "versionCode": 1,
+      "usesCleartextTraffic": true,
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",

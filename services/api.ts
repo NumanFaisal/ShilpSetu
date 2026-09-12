@@ -46,35 +46,42 @@ export const setBaseUrl = (newUrl: string): void => {
 export const getBaseUrl = (): string => {
   if (_customBaseUrl) return _customBaseUrl;
 
+  const DEFAULT_PROD_URL = 'https://shilpsetu-backend-t5a1.onrender.com';
+
   // 1. If explicit remote production URL is defined
   const envUrl = typeof process !== 'undefined' ? process.env?.EXPO_PUBLIC_API_URL : null;
-  if (envUrl && envUrl.startsWith('https://')) {
+  if (envUrl && envUrl.startsWith('http')) {
     return envUrl.replace(/\/$/, '');
   }
 
   // 2. Web browser
   if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.hostname) {
-    return `http://${window.location.hostname}:5001`;
-  }
-
-  // 3. Dynamic resolution from Expo development server host (works automatically across any Wi-Fi)
-  const hostUri =
-    Constants.expoConfig?.hostUri ||
-    (Constants as any).manifest?.debuggerHost ||
-    (Constants as any).manifest2?.extra?.expoGo?.debuggerHost;
-  if (hostUri && typeof hostUri === 'string') {
-    const ip = hostUri.split(':')[0];
-    if (ip) {
-      if (Platform.OS === 'android' && (ip === 'localhost' || ip === '127.0.0.1')) {
-        return 'http://10.0.2.2:5001';
-      }
-      return `http://${ip}:5001`;
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return `http://${window.location.hostname}:5001`;
     }
+    return DEFAULT_PROD_URL;
   }
 
-  // 4. Configured environment variable
-  if (envUrl) {
-    return envUrl.replace(/\/$/, '');
+  // 3. Dynamic resolution from Expo development server host (only in development)
+  if (__DEV__) {
+    const hostUri =
+      Constants.expoConfig?.hostUri ||
+      (Constants as any).manifest?.debuggerHost ||
+      (Constants as any).manifest2?.extra?.expoGo?.debuggerHost;
+    if (hostUri && typeof hostUri === 'string') {
+      const ip = hostUri.split(':')[0];
+      if (ip) {
+        if (Platform.OS === 'android' && (ip === 'localhost' || ip === '127.0.0.1')) {
+          return 'http://10.0.2.2:5001';
+        }
+        return `http://${ip}:5001`;
+      }
+    }
+
+    // Android emulator loopback fallback in dev
+    if (Platform.OS === 'android') {
+      return 'http://10.0.2.2:5001';
+    }
   }
 
   const extraUrl = (Constants.expoConfig?.extra as any)?.apiUrl;
@@ -82,12 +89,8 @@ export const getBaseUrl = (): string => {
     return extraUrl.replace(/\/$/, '');
   }
 
-  // 5. Android emulator loopback fallback
-  if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:5001';
-  }
-
-  return 'http://192.168.1.13:5001';
+  // 4. Default to the live cloud backend for standalone builds and physical devices
+  return DEFAULT_PROD_URL;
 };
 
 export const getApiUrl = (endpoint: string = ''): string => {
