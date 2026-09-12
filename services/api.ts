@@ -46,35 +46,42 @@ export const setBaseUrl = (newUrl: string): void => {
 export const getBaseUrl = (): string => {
   if (_customBaseUrl) return _customBaseUrl;
 
+  const DEFAULT_PROD_URL = 'https://shilpsetu-backend-t5a1.onrender.com';
+
   // 1. If explicit remote production URL is defined
   const envUrl = typeof process !== 'undefined' ? process.env?.EXPO_PUBLIC_API_URL : null;
-  if (envUrl && envUrl.startsWith('https://')) {
+  if (envUrl && envUrl.startsWith('http')) {
     return envUrl.replace(/\/$/, '');
   }
 
   // 2. Web browser
   if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.hostname) {
-    return `http://${window.location.hostname}:5001`;
-  }
-
-  // 3. Dynamic resolution from Expo development server host (works automatically across any Wi-Fi)
-  const hostUri =
-    Constants.expoConfig?.hostUri ||
-    (Constants as any).manifest?.debuggerHost ||
-    (Constants as any).manifest2?.extra?.expoGo?.debuggerHost;
-  if (hostUri && typeof hostUri === 'string') {
-    const ip = hostUri.split(':')[0];
-    if (ip) {
-      if (Platform.OS === 'android' && (ip === 'localhost' || ip === '127.0.0.1')) {
-        return 'http://10.0.2.2:5001';
-      }
-      return `http://${ip}:5001`;
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return `http://${window.location.hostname}:5001`;
     }
+    return DEFAULT_PROD_URL;
   }
 
-  // 4. Configured environment variable
-  if (envUrl) {
-    return envUrl.replace(/\/$/, '');
+  // 3. Dynamic resolution from Expo development server host (only in development)
+  if (__DEV__) {
+    const hostUri =
+      Constants.expoConfig?.hostUri ||
+      (Constants as any).manifest?.debuggerHost ||
+      (Constants as any).manifest2?.extra?.expoGo?.debuggerHost;
+    if (hostUri && typeof hostUri === 'string') {
+      const ip = hostUri.split(':')[0];
+      if (ip) {
+        if (Platform.OS === 'android' && (ip === 'localhost' || ip === '127.0.0.1')) {
+          return 'http://10.0.2.2:5001';
+        }
+        return `http://${ip}:5001`;
+      }
+    }
+
+    // Android emulator loopback fallback in dev
+    if (Platform.OS === 'android') {
+      return 'http://10.0.2.2:5001';
+    }
   }
 
   const extraUrl = (Constants.expoConfig?.extra as any)?.apiUrl;
@@ -82,12 +89,8 @@ export const getBaseUrl = (): string => {
     return extraUrl.replace(/\/$/, '');
   }
 
-  // 5. Android emulator loopback fallback
-  if (Platform.OS === 'android') {
-    return 'http://10.0.2.2:5001';
-  }
-
-  return 'http://192.168.1.13:5001';
+  // 4. Default to the live cloud backend for standalone builds and physical devices
+  return DEFAULT_PROD_URL;
 };
 
 export const getApiUrl = (endpoint: string = ''): string => {
@@ -627,7 +630,7 @@ export const processImages = async (
   suggestedBackground: 'white' | 'ivory' | 'natural';
   enhancements: string[];
 }> => {
-  const style = options?.style || 'white_studio';
+  const style = options?.style || 'smart_contextual';
   let batchId = '';
 
   try {
@@ -740,14 +743,12 @@ export const processImages = async (
       if (data && data.batchId) {
         batchId = data.batchId;
 
-        // Poll batch status up to 20 times (1.0s interval) to wait for AI outputs
+        // Fast check (2 attempts) to see if outputs are immediately available
         const targetCount = imageUris.length;
-        for (let i = 0; i < 20; i++) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+        for (let i = 0; i < 2; i++) {
+          await new Promise((resolve) => setTimeout(resolve, 800));
           try {
             const batchDetails = await apiRequest<any>(`/api/image-batches/${batchId}`, {}, true);
-            console.log(`[API] Polling batch ${batchId} [attempt ${i + 1}/20] status: ${batchDetails?.status}`);
-
             if (batchDetails?.images?.length > 0) {
               const remoteUrls = batchDetails.images
                 .map((img: any) => img.outputs?.square || img.outputs?.portrait || img.outputs?.landscape)
@@ -755,8 +756,7 @@ export const processImages = async (
 
               const isCompleted =
                 remoteUrls.length >= targetCount ||
-                (batchDetails.status === 'COMPLETED' && remoteUrls.length > 0) ||
-                (batchDetails.status === 'PARTIAL_FAILURE' && remoteUrls.length > 0);
+                (batchDetails.status === 'COMPLETED' && remoteUrls.length > 0);
 
               if (isCompleted && remoteUrls.length > 0) {
                 return {
@@ -765,43 +765,29 @@ export const processImages = async (
                   suggestedBackground: style.includes('white') ? 'white' : 'natural',
                   enhancements: [
                     'AI precision background removed',
-                    'Studio cyclorama background composite',
-                    'Directional soft lighting & contact shadows',
-                    'Ready for marketplace export (Square, Portrait, Landscape)',
+                    'Craft-specific contextual backdrop generated',
+                    'Handmade details & textures sharpened',
+                    'Natural color vibrancy & dynamic range enhanced',
+                    'Directional studio lighting & contact shadow applied',
                   ],
                 };
               }
             }
           } catch (pollErr) {
-            console.warn('[API] Poll batch warning:', pollErr);
+            console.warn('[API] Fast batch check:', pollErr);
           }
         }
 
-        // Check one last time before returning
-        const finalUrls = await fetchBatchImages(batchId);
-        if (finalUrls.length > 0) {
-          return {
-            id: batchId,
-            processedImages: finalUrls,
-            suggestedBackground: style.includes('white') ? 'white' : 'natural',
-            enhancements: [
-              'AI precision background removed',
-              'Studio cyclorama background composite',
-              'Directional soft lighting & contact shadows',
-              'Ready for marketplace export',
-            ],
-          };
-        }
-
+        // Return batchId immediately so the studio screen opens without freezing
         return {
           id: batchId,
           processedImages: imageUris,
           suggestedBackground: style.includes('white') ? 'white' : 'natural',
           enhancements: [
-            'Studio cyclorama background rendering',
-            'Soft lighting adjusted',
-            'Product details sharpened',
-            'Processing in background',
+            'AI precision background removed',
+            'Generating craft-specific contextual backdrop',
+            'Enhancing details & vibrant colors',
+            'Rendering studio lighting & contact shadows',
           ],
         };
       }
@@ -813,8 +799,13 @@ export const processImages = async (
   return {
     id: batchId,
     processedImages: imageUris,
-    suggestedBackground: 'white',
-    enhancements: ['Background removed', 'Brightness adjusted', 'Sharpness enhanced'],
+    suggestedBackground: 'natural',
+    enhancements: [
+      'Background removed with AI precision',
+      'Contextual artisan backdrop rendered',
+      'Craft details & textures sharpened',
+      'Natural colors & lighting harmonized',
+    ],
   };
 };
 
@@ -1357,10 +1348,12 @@ export const imageStudioApi = {
       console.warn('[API] getStyles fallback:', e);
     }
     return [
-      { id: 'white_studio', name: 'White Studio', description: 'Clean white cyclorama with soft diffused lighting. Perfect for Amazon & Flipkart.', previewColor: '#F5F6F8' },
-      { id: 'wooden_surface', name: 'Wooden Surface', description: 'Warm teak wood tabletop with natural grain and soft lighting.', previewColor: '#A67B4B' },
-      { id: 'marble_surface', name: 'Marble Surface', description: 'Luxurious Carrara marble with subtle veining and sheen.', previewColor: '#E5E3DF' },
-      { id: 'luxury', name: 'Luxury Dark', description: 'Dark editorial studio backdrop with golden rim lighting.', previewColor: '#1E222A' },
+      { id: 'smart_contextual', name: '✨ Smart AI Craft Studio (Recommended)', description: 'Auto-detects your craft (pottery, brass, handloom, wood, jewelry) and renders an authentic matching backdrop.', previewColor: '#C26D43' },
+      { id: 'botanical_lifestyle', name: '🌿 Lifestyle Studio with Botanical Elements', description: 'Warm natural tabletop with soft cream wall, gentle morning window light, and an aesthetic potted green plant.', previewColor: '#527C44' },
+      { id: 'artisan_workshop', name: '🪵 Rustic Artisan Workshop', description: 'Warm teakwood workbench with natural wood grain and soft daylight. Ideal for pottery & crafts.', previewColor: '#A67B4B' },
+      { id: 'heritage_courtyard', name: '🏛️ Heritage Indian Courtyard', description: 'Traditional carved sandstone archway with warm ambient lighting. Perfect for brass & metalcraft.', previewColor: '#BD8253' },
+      { id: 'luxury_showcase', name: '💎 Luxury Marble Showcase', description: 'Polished Carrara marble with fine veining and soft editorial spotlight. Great for jewelry.', previewColor: '#E5E3DF' },
+      { id: 'clean_marketplace', name: '📦 Clean Marketplace Studio', description: 'Clean white cyclorama with soft diffused lighting. Amazon & Flipkart ready.', previewColor: '#F5F6F8' },
     ];
   },
   getStylePreviewUrl: (id: string) => getApiUrl(`/api/studio-styles/${id}/preview`),

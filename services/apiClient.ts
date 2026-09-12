@@ -45,6 +45,8 @@ class ApiClient {
   public getBaseUrl(): string {
     if (this.customBaseUrl) return this.customBaseUrl;
 
+    const DEFAULT_PROD_URL = 'https://shilpsetu-backend-t5a1.onrender.com';
+
     const envUrl = typeof process !== 'undefined' ? process.env?.EXPO_PUBLIC_API_URL : null;
     if (envUrl && envUrl.startsWith('http')) {
       return envUrl.replace(/\/$/, '');
@@ -52,30 +54,36 @@ class ApiClient {
 
     // Web Browser runtime
     if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.hostname) {
-      return `http://${window.location.hostname}:5001`;
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return `http://${window.location.hostname}:5001`;
+      }
+      return DEFAULT_PROD_URL;
     }
 
-    // Expo Go / Native LAN detection
-    const hostUri =
-      Constants.expoConfig?.hostUri ||
-      (Constants as any).manifest?.debuggerHost ||
-      (Constants as any).manifest2?.extra?.expoGo?.debuggerHost;
+    // Expo Go / Native LAN detection (only in development)
+    if (__DEV__) {
+      const hostUri =
+        Constants.expoConfig?.hostUri ||
+        (Constants as any).manifest?.debuggerHost ||
+        (Constants as any).manifest2?.extra?.expoGo?.debuggerHost;
 
-    if (hostUri && typeof hostUri === 'string') {
-      const ip = hostUri.split(':')[0];
-      if (ip) {
-        if (Platform.OS === 'android' && (ip === 'localhost' || ip === '127.0.0.1')) {
-          return 'http://10.0.2.2:5001';
+      if (hostUri && typeof hostUri === 'string') {
+        const ip = hostUri.split(':')[0];
+        if (ip) {
+          if (Platform.OS === 'android' && (ip === 'localhost' || ip === '127.0.0.1')) {
+            return 'http://10.0.2.2:5001';
+          }
+          return `http://${ip}:5001`;
         }
-        return `http://${ip}:5001`;
+      }
+
+      if (Platform.OS === 'android') {
+        return 'http://10.0.2.2:5001';
       }
     }
 
-    if (Platform.OS === 'android') {
-      return 'http://10.0.2.2:5001';
-    }
-
-    return 'http://localhost:5001';
+    // Standalone Release APK and production fallback
+    return DEFAULT_PROD_URL;
   }
 
   public async getAuthToken(): Promise<string | null> {

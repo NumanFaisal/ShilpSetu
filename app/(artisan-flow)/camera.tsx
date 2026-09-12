@@ -47,20 +47,16 @@ export default function CameraScreen() {
     try {
       setIsCapturing(true);
       const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.65,
-        base64: true,
-        skipProcessing: false,
+        quality: 0.7,
+        skipProcessing: true,
       });
 
-      // Prefer direct base64 data URI so native file system access errors are completely avoided
-      const photoUri = photo?.base64
-        ? `data:image/jpeg;base64,${photo.base64}`
-        : photo?.uri || '';
-
+      const photoUri = photo?.uri || '';
       if (!photoUri) return;
 
       const newPhotos = [...photos, photoUri];
       setPhotos(newPhotos);
+      updateDraftProduct({ images: newPhotos });
 
       // Advance automatically if max (5 photos) is reached
       if (newPhotos.length >= 5) {
@@ -82,18 +78,11 @@ export default function CameraScreen() {
         mediaTypes: ['images'],
         allowsMultipleSelection: true,
         selectionLimit: 5 - photos.length,
-        quality: 0.65,
-        base64: true,
+        quality: 0.7,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        const picked = result.assets.map((asset) => {
-          if (asset.base64) {
-            return `data:image/jpeg;base64,${asset.base64}`;
-          }
-          return asset.uri;
-        }).filter(Boolean);
-
+        const picked = result.assets.map((asset) => asset.uri).filter(Boolean);
         const merged = [...photos, ...picked].slice(0, 5);
         setPhotos(merged);
         updateDraftProduct({ images: merged });

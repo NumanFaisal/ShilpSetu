@@ -55,10 +55,13 @@ export default function PricingScreen() {
     updateDraftProduct({ price: numericPrice });
 
     try {
-      const res = await publishProduct({
-        ...draftProduct,
-        price: numericPrice,
-      });
+      const res = await publishProduct(
+        {
+          ...draftProduct,
+          price: numericPrice,
+        },
+        { isOffline: !isOnline }
+      );
       if (res?.productId) {
         updateDraftProduct({ id: res.productId } as any);
       }

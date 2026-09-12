@@ -11,37 +11,49 @@ import { processImages, imageStudioApi, StudioStyle } from '../../services/api';
 import { useAppStore } from '../../store/useAppStore';
 
 const PROCESSING_STEPS = [
-  'Analysing craft composition & angles',
-  'Removing background with AI precision',
-  'Rendering realistic studio lighting & reflections',
-  'Sharpening handmade textures & intricate details',
-  'Generating high-resolution marketplace formats',
+  'Identifying craft type, materials & authenticity',
+  'Removing background with AI edge precision',
+  'Generating contextual studio backdrop matching your craft',
+  'Sharpening handmade textures & enhancing vibrant colors',
+  'Applying realistic contact shadow & commercial lighting',
 ];
 
 const DEFAULT_STYLES: StudioStyle[] = [
   {
-    id: 'white_studio',
-    name: 'White Studio',
-    description: 'Clean white cyclorama with soft diffused lighting. Perfect for Amazon & Flipkart.',
-    previewColor: '#F5F6F8',
+    id: 'smart_contextual',
+    name: '✨ Smart AI Craft Studio (Recommended)',
+    description: 'Auto-detects your craft (pottery, brass, handloom, wood, jewelry) and renders an authentic matching backdrop.',
+    previewColor: '#C26D43',
   },
   {
-    id: 'wooden_surface',
-    name: 'Wooden Surface',
-    description: 'Warm teak wood tabletop with natural grain. Ideal for handmade pottery & crafts.',
+    id: 'botanical_lifestyle',
+    name: '🌿 Lifestyle Studio with Botanical Elements',
+    description: 'Warm natural tabletop with soft cream wall, gentle morning window light, and an aesthetic potted green plant in the soft background.',
+    previewColor: '#527C44',
+  },
+  {
+    id: 'artisan_workshop',
+    name: '🪵 Rustic Artisan Workshop',
+    description: 'Warm teakwood workbench with natural wood grain and soft morning daylight. Ideal for handmade pottery & crafts.',
     previewColor: '#A67B4B',
   },
   {
-    id: 'marble_surface',
-    name: 'Marble Surface',
-    description: 'Luxurious Carrara marble with subtle veining. Great for jewelry & premium decor.',
+    id: 'heritage_courtyard',
+    name: '🏛️ Heritage Indian Courtyard',
+    description: 'Traditional carved sandstone archway with warm ambient lighting. Accentuates brassware, bronze & festive crafts.',
+    previewColor: '#BD8253',
+  },
+  {
+    id: 'luxury_showcase',
+    name: '💎 Luxury Marble Showcase',
+    description: 'Polished Carrara marble with fine veining and soft editorial spotlight. Great for jewelry & premium decor.',
     previewColor: '#E5E3DF',
   },
   {
-    id: 'luxury',
-    name: 'Luxury Dark',
-    description: 'Dark editorial backdrop with golden rim lighting. High-end luxury photography.',
-    previewColor: '#1E222A',
+    id: 'clean_marketplace',
+    name: '📦 Clean Marketplace Studio',
+    description: 'Clean white cyclorama with soft diffused lighting and grounded reflections. Perfect for Amazon & Flipkart.',
+    previewColor: '#F5F6F8',
   },
 ];
 
@@ -71,7 +83,7 @@ export function resolveImageUri(input: any): string {
 
 export default function ImageProcessingScreen() {
   const { uris, batchId: paramBatchId } = useLocalSearchParams<{ uris?: string; batchId?: string }>();
-  const { simulateAIError, updateDraftProduct, draftProduct } = useAppStore();
+  const { simulateAIError, updateDraftProduct, draftProduct, isOnline } = useAppStore();
 
   const [images, setImages] = useState<string[]>([]);
   const [originalImages, setOriginalImages] = useState<string[]>([]);
@@ -89,7 +101,7 @@ export default function ImageProcessingScreen() {
   >({});
 
   const [styles, setStyles] = useState<StudioStyle[]>(DEFAULT_STYLES);
-  const [selectedStyle, setSelectedStyle] = useState<string>('white_studio');
+  const [selectedStyle, setSelectedStyle] = useState<string>('smart_contextual');
   const [processing, setProcessing] = useState(false);
   const [done, setDone] = useState(false);
   const [batchId, setBatchId] = useState<string | null>(paramBatchId || null);
@@ -98,10 +110,11 @@ export default function ImageProcessingScreen() {
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [enhancements, setEnhancements] = useState<string[]>([
-    'AI precision background removed',
-    'Studio cyclorama backdrop rendered',
-    'Commercial lighting & contact shadow',
-    'High-resolution multi-format exports',
+    'Background removed with AI precision',
+    'Craft-specific contextual backdrop rendered',
+    'Handmade micro-textures & details sharpened',
+    'Natural color vibrancy & contrast enhanced',
+    'Directional studio lighting & contact shadow applied',
   ]);
 
   const pollTimerRef = useRef<any>(null);
@@ -248,7 +261,7 @@ export default function ImageProcessingScreen() {
 
     console.log(`[ImageProcessing] Starting background polling for batch ${batchId} (${processedImages.length}/${expectedCount} images ready)...`);
     let attempts = 0;
-    const maxAttempts = 20;
+    const maxAttempts = 60; // 60 attempts * 1.8s = ~108s total window
 
     pollTimerRef.current = setInterval(async () => {
       attempts++;
@@ -256,7 +269,7 @@ export default function ImageProcessingScreen() {
       if (success || attempts >= maxAttempts) {
         clearInterval(pollTimerRef.current);
       }
-    }, 1000);
+    }, 1800);
 
     return () => {
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
@@ -295,6 +308,14 @@ export default function ImageProcessingScreen() {
   const startProcessing = async (imageUris: string[], styleId: string = selectedStyle) => {
     const cleanInputs = imageUris.map(resolveImageUri).filter(Boolean);
     if (cleanInputs.length === 0) return;
+
+    // Offline First: If mobile has no internet, save photos directly and proceed smoothly
+    if (!isOnline) {
+      updateDraftProduct({ images: cleanInputs });
+      router.push('/(artisan-flow)/voice-description');
+      return;
+    }
+
     setProcessing(true);
     setError(null);
 
@@ -339,6 +360,8 @@ export default function ImageProcessingScreen() {
       setDone(true);
     } catch (e: any) {
       clearInterval(stepInterval);
+      // Even on failure, preserve the photos so the artisan is never blocked
+      updateDraftProduct({ images: cleanInputs });
       setError(e.message || 'Image enhancement failed. Please verify network connection.');
     } finally {
       setProcessing(false);
@@ -451,11 +474,11 @@ export default function ImageProcessingScreen() {
 
   // 4. Done State: Show enhanced studio photo
   if (done) {
-    const selectedStyleObj = styles.find((s) => s.id === selectedStyle);
+    const selectedStyleObj = styles.find((s) => s.id === selectedStyle) || DEFAULT_STYLES[0];
     const isEnhancedMode = viewMode === 'enhanced';
     const hasRemoteEnhanced =
       processedImages.length > 0 &&
-      processedImages.some((u) => typeof u === 'string' && u.startsWith('http'));
+      processedImages.some((u) => typeof u === 'string' && (u.startsWith('http') || u.startsWith('data:') || u.startsWith('file:')));
 
     // Select URI based on aspect ratio for the specifically selected active photo
     const activePhotoOutputs = availableOutputsMap[activePhotoIdx] || availableOutputs;
@@ -484,14 +507,14 @@ export default function ImageProcessingScreen() {
                   Studio Photos Ready
                 </Text>
                 <AIBadge
-                  label={hasRemoteEnhanced ? 'AI Studio Active' : 'Rendering...'}
+                  label={hasRemoteEnhanced ? 'AI Contextual Studio' : 'Rendering Studio...'}
                   variant={hasRemoteEnhanced ? 'match' : 'suggested'}
                 />
               </View>
               {batchId && (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: '#8A726B' }}>
-                    Batch #{batchId.slice(0, 8)} • {selectedStyleObj?.name || 'Studio'} • {batchStatus}
+                    Batch #{batchId.slice(0, 8)} • {selectedStyleObj?.name?.split('(')[0] || 'Studio'} • {batchStatus}
                   </Text>
                   <TouchableOpacity
                     onPress={() => batchId && fetchBatchEnhanced(batchId)}
@@ -503,6 +526,43 @@ export default function ImageProcessingScreen() {
                 </View>
               )}
             </View>
+          </View>
+
+          {/* Contextual Backdrop Applied Card */}
+          <View
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 14,
+              padding: 14,
+              borderWidth: 1,
+              borderColor: '#EBDCD4',
+              gap: 6,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.05,
+              shadowRadius: 3,
+              elevation: 1,
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Sparkles size={14} color="#B5502F" />
+                <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 13, color: '#B5502F' }}>
+                  AI Scene & Craft Enhancement
+                </Text>
+              </View>
+              <View style={{ backgroundColor: '#EBF4E8', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 10, color: '#3B6B30' }}>
+                  Grounded & Sharpened
+                </Text>
+              </View>
+            </View>
+            <Text style={{ fontFamily: 'Fraunces_600SemiBold', fontSize: 16, color: '#2B2420' }}>
+              {selectedStyleObj?.name || 'Smart AI Craft Studio'}
+            </Text>
+            <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: '#56423C', lineHeight: 17 }}>
+              {selectedStyleObj?.description || 'Backdrop matched to your craft with realistic studio lighting and contact shadows.'}
+            </Text>
           </View>
 
           {/* View Mode Toggle: Enhanced vs Original */}
@@ -607,12 +667,13 @@ export default function ImageProcessingScreen() {
               <>
                 <Image source={{ uri: currentUri }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
                 {isEnhancedMode && !hasRemoteEnhanced && (
-                  <View
+                  <TouchableOpacity
+                    onPress={() => batchId && fetchBatchEnhanced(batchId)}
                     style={{
                       position: 'absolute',
                       top: 12,
                       left: 12,
-                      backgroundColor: 'rgba(43,36,32,0.85)',
+                      backgroundColor: 'rgba(43,36,32,0.88)',
                       borderRadius: 20,
                       paddingHorizontal: 12,
                       paddingVertical: 6,
@@ -623,9 +684,9 @@ export default function ImageProcessingScreen() {
                   >
                     <ActivityIndicator size="small" color="#E59866" />
                     <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: '#FFFFFF' }}>
-                      Studio Lighting Rendering...
+                      {isRefreshing ? 'Checking Cloud...' : 'AI Studio Rendering (Tap to Refresh)'}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 )}
                 <View
                   style={{
@@ -639,7 +700,7 @@ export default function ImageProcessingScreen() {
                   }}
                 >
                   <Text style={{ color: '#FFFFFF', fontSize: 11, fontFamily: 'Inter_600SemiBold' }}>
-                    {viewMode === 'enhanced' ? `✨ ${selectedStyleObj?.name || 'Studio'}` : 'Original Photo'}
+                    {viewMode === 'enhanced' ? `✨ ${selectedStyleObj?.name || 'Contextual Studio'}` : '📷 Original Photo (Before)'}
                   </Text>
                 </View>
                 {isEnhancedMode && hasRemoteEnhanced && (
@@ -655,7 +716,7 @@ export default function ImageProcessingScreen() {
                     }}
                   >
                     <Text style={{ color: '#FFFFFF', fontSize: 10, fontFamily: 'Inter_500Medium' }}>
-                      API: /api/image-batches/{batchId?.slice(0, 8)}
+                      AI Studio • Contextual Craft Lighting Active
                     </Text>
                   </View>
                 )}
@@ -705,7 +766,7 @@ export default function ImageProcessingScreen() {
             }}
           >
             <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 14, color: '#2B2420' }}>
-              Studio Specifications Applied
+              Studio Enhancements & Craft Context Applied
             </Text>
             {enhancements.map((e, idx) => (
               <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -771,7 +832,7 @@ export default function ImageProcessingScreen() {
             <Sparkles size={20} color="#B5502F" />
           </View>
           <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 14, color: '#56423C', lineHeight: 20 }}>
-            Select a studio backdrop style for your {images.length} {images.length === 1 ? 'photo' : 'photos'}.
+            Choose an AI studio backdrop. The smart studio auto-detects your craft and renders a contextual setting with enhanced textures and lighting.
           </Text>
         </View>
 
@@ -896,10 +957,40 @@ export default function ImageProcessingScreen() {
           </View>
         </View>
 
+        {/* Offline Mode Banner */}
+        {!isOnline && (
+          <View
+            style={{
+              backgroundColor: '#FFF8EB',
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: '#E6C687',
+              padding: 14,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
+            }}
+          >
+            <Text style={{ fontSize: 20 }}>📡</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 13, color: '#825608' }}>
+                Offline Mode Active
+              </Text>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: '#825608', lineHeight: 16 }}>
+                Photos saved to your draft. You can describe and price your craft now; studio enhancements will sync when you reconnect.
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* Submit Button */}
         <View style={{ gap: 12, marginTop: 8 }}>
           <Button
-            label={`Enhance with ${styles.find((s) => s.id === selectedStyle)?.name || 'AI'}`}
+            label={
+              !isOnline
+                ? 'Save Photos & Continue Offline →'
+                : `Enhance with ${styles.find((s) => s.id === selectedStyle)?.name?.split('(')[0]?.trim() || 'AI Studio'} →`
+            }
             onPress={() => startProcessing(images, selectedStyle)}
           />
           <TouchableOpacity

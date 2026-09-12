@@ -2,7 +2,8 @@ name: ShilpSetu-AI-APKs
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, Numan-features ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,8 +23,16 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      # Injects production API URL into .env for Metro bundler
+      - name: Inject Production Environment Variables
+        run: |
+          echo "EXPO_PUBLIC_API_URL=https://shilpsetu-backend-t5a1.onrender.com" > .env
+          cat .env
+
       # 1. Generate the android directory first so gradle files exist
       - name: Generate Native Android Project (Expo Prebuild)
+        env:
+          EXPO_PUBLIC_API_URL: "https://shilpsetu-backend-t5a1.onrender.com"
         run: npx expo prebuild --platform android --clean
 
       # 2. Setup Java JDK 17 (Clean build without corrupted cache)
@@ -61,6 +70,7 @@ jobs:
           ORG_GRADLE_PROJECT_MYAPP_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ORG_GRADLE_PROJECT_MYAPP_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ORG_GRADLE_PROJECT_MYAPP_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          EXPO_PUBLIC_API_URL: "https://shilpsetu-backend-t5a1.onrender.com"
         run: |
           cd android
           ./gradlew assembleRelease --no-daemon --no-build-cache --stacktrace -x lint -x test
