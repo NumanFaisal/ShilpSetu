@@ -248,7 +248,7 @@ export default function ImageProcessingScreen() {
 
     console.log(`[ImageProcessing] Starting background polling for batch ${batchId} (${processedImages.length}/${expectedCount} images ready)...`);
     let attempts = 0;
-    const maxAttempts = 20;
+    const maxAttempts = 60; // 60 attempts * 1.8s = ~108s total window
 
     pollTimerRef.current = setInterval(async () => {
       attempts++;
@@ -256,7 +256,7 @@ export default function ImageProcessingScreen() {
       if (success || attempts >= maxAttempts) {
         clearInterval(pollTimerRef.current);
       }
-    }, 1000);
+    }, 1800);
 
     return () => {
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
@@ -607,12 +607,13 @@ export default function ImageProcessingScreen() {
               <>
                 <Image source={{ uri: currentUri }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
                 {isEnhancedMode && !hasRemoteEnhanced && (
-                  <View
+                  <TouchableOpacity
+                    onPress={() => batchId && fetchBatchEnhanced(batchId)}
                     style={{
                       position: 'absolute',
                       top: 12,
                       left: 12,
-                      backgroundColor: 'rgba(43,36,32,0.85)',
+                      backgroundColor: 'rgba(43,36,32,0.88)',
                       borderRadius: 20,
                       paddingHorizontal: 12,
                       paddingVertical: 6,
@@ -623,9 +624,9 @@ export default function ImageProcessingScreen() {
                   >
                     <ActivityIndicator size="small" color="#E59866" />
                     <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: '#FFFFFF' }}>
-                      Studio Lighting Rendering...
+                      {isRefreshing ? 'Checking Cloud...' : 'AI Studio Rendering (Tap to Refresh)'}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 )}
                 <View
                   style={{

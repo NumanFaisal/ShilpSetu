@@ -743,14 +743,12 @@ export const processImages = async (
       if (data && data.batchId) {
         batchId = data.batchId;
 
-        // Poll batch status up to 20 times (1.0s interval) to wait for AI outputs
+        // Fast check (2 attempts) to see if outputs are immediately available
         const targetCount = imageUris.length;
-        for (let i = 0; i < 20; i++) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+        for (let i = 0; i < 2; i++) {
+          await new Promise((resolve) => setTimeout(resolve, 800));
           try {
             const batchDetails = await apiRequest<any>(`/api/image-batches/${batchId}`, {}, true);
-            console.log(`[API] Polling batch ${batchId} [attempt ${i + 1}/20] status: ${batchDetails?.status}`);
-
             if (batchDetails?.images?.length > 0) {
               const remoteUrls = batchDetails.images
                 .map((img: any) => img.outputs?.square || img.outputs?.portrait || img.outputs?.landscape)
@@ -758,8 +756,7 @@ export const processImages = async (
 
               const isCompleted =
                 remoteUrls.length >= targetCount ||
-                (batchDetails.status === 'COMPLETED' && remoteUrls.length > 0) ||
-                (batchDetails.status === 'PARTIAL_FAILURE' && remoteUrls.length > 0);
+                (batchDetails.status === 'COMPLETED' && remoteUrls.length > 0);
 
               if (isCompleted && remoteUrls.length > 0) {
                 return {
@@ -776,26 +773,11 @@ export const processImages = async (
               }
             }
           } catch (pollErr) {
-            console.warn('[API] Poll batch warning:', pollErr);
+            console.warn('[API] Fast batch check:', pollErr);
           }
         }
 
-        // Check one last time before returning
-        const finalUrls = await fetchBatchImages(batchId);
-        if (finalUrls.length > 0) {
-          return {
-            id: batchId,
-            processedImages: finalUrls,
-            suggestedBackground: style.includes('white') ? 'white' : 'natural',
-            enhancements: [
-              'AI precision background removed',
-              'Studio cyclorama background composite',
-              'Directional soft lighting & contact shadows',
-              'Ready for marketplace export',
-            ],
-          };
-        }
-
+        // Return batchId immediately so the studio screen opens without freezing
         return {
           id: batchId,
           processedImages: imageUris,
