@@ -71,7 +71,7 @@ export function resolveImageUri(input: any): string {
 
 export default function ImageProcessingScreen() {
   const { uris, batchId: paramBatchId } = useLocalSearchParams<{ uris?: string; batchId?: string }>();
-  const { simulateAIError, updateDraftProduct, draftProduct } = useAppStore();
+  const { simulateAIError, updateDraftProduct, draftProduct, isOnline } = useAppStore();
 
   const [images, setImages] = useState<string[]>([]);
   const [originalImages, setOriginalImages] = useState<string[]>([]);
@@ -295,6 +295,14 @@ export default function ImageProcessingScreen() {
   const startProcessing = async (imageUris: string[], styleId: string = selectedStyle) => {
     const cleanInputs = imageUris.map(resolveImageUri).filter(Boolean);
     if (cleanInputs.length === 0) return;
+
+    // Offline First: If mobile has no internet, save photos directly and proceed smoothly
+    if (!isOnline) {
+      updateDraftProduct({ images: cleanInputs });
+      router.push('/(artisan-flow)/voice-description');
+      return;
+    }
+
     setProcessing(true);
     setError(null);
 
@@ -339,6 +347,8 @@ export default function ImageProcessingScreen() {
       setDone(true);
     } catch (e: any) {
       clearInterval(stepInterval);
+      // Even on failure, preserve the photos so the artisan is never blocked
+      updateDraftProduct({ images: cleanInputs });
       setError(e.message || 'Image enhancement failed. Please verify network connection.');
     } finally {
       setProcessing(false);
@@ -897,10 +907,40 @@ export default function ImageProcessingScreen() {
           </View>
         </View>
 
+        {/* Offline Mode Banner */}
+        {!isOnline && (
+          <View
+            style={{
+              backgroundColor: '#FFF8EB',
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: '#E6C687',
+              padding: 14,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
+            }}
+          >
+            <Text style={{ fontSize: 20 }}>📡</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 13, color: '#825608' }}>
+                Offline Mode Active
+              </Text>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: '#825608', lineHeight: 16 }}>
+                Photos saved to your draft. You can describe and price your craft now; studio enhancements will sync when you reconnect.
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* Submit Button */}
         <View style={{ gap: 12, marginTop: 8 }}>
           <Button
-            label={`Enhance with ${styles.find((s) => s.id === selectedStyle)?.name || 'AI'}`}
+            label={
+              !isOnline
+                ? 'Save Photos & Continue Offline →'
+                : `Enhance with ${styles.find((s) => s.id === selectedStyle)?.name || 'AI'}`
+            }
             onPress={() => startProcessing(images, selectedStyle)}
           />
           <TouchableOpacity
