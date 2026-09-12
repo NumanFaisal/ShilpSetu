@@ -630,7 +630,7 @@ export const processImages = async (
   suggestedBackground: 'white' | 'ivory' | 'natural';
   enhancements: string[];
 }> => {
-  const style = options?.style || 'white_studio';
+  const style = options?.style || 'smart_contextual';
   let batchId = '';
 
   try {
@@ -765,9 +765,10 @@ export const processImages = async (
                   suggestedBackground: style.includes('white') ? 'white' : 'natural',
                   enhancements: [
                     'AI precision background removed',
-                    'Studio cyclorama background composite',
-                    'Directional soft lighting & contact shadows',
-                    'Ready for marketplace export (Square, Portrait, Landscape)',
+                    'Craft-specific contextual backdrop generated',
+                    'Handmade details & textures sharpened',
+                    'Natural color vibrancy & dynamic range enhanced',
+                    'Directional studio lighting & contact shadow applied',
                   ],
                 };
               }
@@ -783,10 +784,10 @@ export const processImages = async (
           processedImages: imageUris,
           suggestedBackground: style.includes('white') ? 'white' : 'natural',
           enhancements: [
-            'Studio cyclorama background rendering',
-            'Soft lighting adjusted',
-            'Product details sharpened',
-            'Processing in background',
+            'AI precision background removed',
+            'Generating craft-specific contextual backdrop',
+            'Enhancing details & vibrant colors',
+            'Rendering studio lighting & contact shadows',
           ],
         };
       }
@@ -798,8 +799,13 @@ export const processImages = async (
   return {
     id: batchId,
     processedImages: imageUris,
-    suggestedBackground: 'white',
-    enhancements: ['Background removed', 'Brightness adjusted', 'Sharpness enhanced'],
+    suggestedBackground: 'natural',
+    enhancements: [
+      'Background removed with AI precision',
+      'Contextual artisan backdrop rendered',
+      'Craft details & textures sharpened',
+      'Natural colors & lighting harmonized',
+    ],
   };
 };
 
@@ -1342,10 +1348,12 @@ export const imageStudioApi = {
       console.warn('[API] getStyles fallback:', e);
     }
     return [
-      { id: 'white_studio', name: 'White Studio', description: 'Clean white cyclorama with soft diffused lighting. Perfect for Amazon & Flipkart.', previewColor: '#F5F6F8' },
-      { id: 'wooden_surface', name: 'Wooden Surface', description: 'Warm teak wood tabletop with natural grain and soft lighting.', previewColor: '#A67B4B' },
-      { id: 'marble_surface', name: 'Marble Surface', description: 'Luxurious Carrara marble with subtle veining and sheen.', previewColor: '#E5E3DF' },
-      { id: 'luxury', name: 'Luxury Dark', description: 'Dark editorial studio backdrop with golden rim lighting.', previewColor: '#1E222A' },
+      { id: 'smart_contextual', name: '✨ Smart AI Craft Studio (Recommended)', description: 'Auto-detects your craft (pottery, brass, handloom, wood, jewelry) and renders an authentic matching backdrop.', previewColor: '#C26D43' },
+      { id: 'botanical_lifestyle', name: '🌿 Lifestyle Studio with Botanical Elements', description: 'Warm natural tabletop with soft cream wall, gentle morning window light, and an aesthetic potted green plant.', previewColor: '#527C44' },
+      { id: 'artisan_workshop', name: '🪵 Rustic Artisan Workshop', description: 'Warm teakwood workbench with natural wood grain and soft daylight. Ideal for pottery & crafts.', previewColor: '#A67B4B' },
+      { id: 'heritage_courtyard', name: '🏛️ Heritage Indian Courtyard', description: 'Traditional carved sandstone archway with warm ambient lighting. Perfect for brass & metalcraft.', previewColor: '#BD8253' },
+      { id: 'luxury_showcase', name: '💎 Luxury Marble Showcase', description: 'Polished Carrara marble with fine veining and soft editorial spotlight. Great for jewelry.', previewColor: '#E5E3DF' },
+      { id: 'clean_marketplace', name: '📦 Clean Marketplace Studio', description: 'Clean white cyclorama with soft diffused lighting. Amazon & Flipkart ready.', previewColor: '#F5F6F8' },
     ];
   },
   getStylePreviewUrl: (id: string) => getApiUrl(`/api/studio-styles/${id}/preview`),
