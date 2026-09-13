@@ -7,11 +7,11 @@ import { generateCatalog } from '../../services/api';
 import { useAppStore } from '../../store/useAppStore';
 
 const STEPS = [
-  'Analysing product category',
-  'Generating product title',
-  'Writing craft description',
-  'Building SEO tags',
-  'Creating catalog entry',
+  'Inspecting craft authenticity with Gemini AI',
+  'Writing bilingual product titles & descriptions',
+  'Tracing traditional craft heritage & regional roots',
+  'Formulating technical specs & artisan labor hours',
+  'Finalizing commercial e-commerce & PDF catalog',
 ];
 
 export default function CatalogGenerationScreen() {
@@ -49,7 +49,26 @@ export default function CatalogGenerationScreen() {
         description: catalog.aiDescription,
         category: catalog.category,
         tags: catalog.tags,
-      });
+        titleEn: catalog.titleEn,
+        titleHi: catalog.titleHi,
+        descriptionEn: catalog.descriptionEn,
+        descriptionHi: catalog.descriptionHi,
+        heritageStory: (catalog as any).heritageStory,
+        heritageStoryHi: (catalog as any).heritageStoryHi,
+        craftProcess: (catalog as any).craftProcess,
+        craftProcessHi: (catalog as any).craftProcessHi,
+        dimensions: (catalog as any).dimensions,
+        weight: (catalog as any).weight,
+        primaryColors: (catalog as any).primaryColors,
+        originRegion: (catalog as any).originRegion,
+        highlights: (catalog as any).highlights,
+        usageAndStyling: (catalog as any).usageAndStyling,
+        careInstructions: (catalog as any).careInstructions,
+        careInstructionsHi: (catalog as any).careInstructionsHi,
+        sustainabilityNotes: (catalog as any).sustainabilityNotes,
+        estimatedProductionHours: (catalog as any).estimatedProductionHours,
+        keywords: (catalog as any).keywords,
+      } as any);
       router.replace('/(artisan-flow)/catalog-review');
     } catch (e: any) {
       clearInterval(interval);

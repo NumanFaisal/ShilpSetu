@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Plus } from 'lucide-react-native';
+import { Plus, FileDown } from 'lucide-react-native';
 import { Header } from '../../../components/ui/Header';
 import { ProductCard } from '../../../components/ui/ProductCard';
 import { EmptyState } from '../../../components/ui/EmptyState';
-import { getMyProducts } from '../../../services/api';
+import { getMyProducts, downloadArtisanCatalogPdf } from '../../../services/api';
 import { useAppStore } from '../../../store/useAppStore';
 
 const FILTERS = ['All', 'Active', 'Draft', 'Archived'] as const;
@@ -75,6 +75,24 @@ export default function MyProductsScreen() {
             <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 13, color: filter === f ? '#B5502F' : '#56423C' }}>{f}</Text>
           </TouchableOpacity>
         ))}
+
+        <TouchableOpacity
+          onPress={() => downloadArtisanCatalogPdf(1)}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            paddingHorizontal: 14,
+            paddingVertical: 8,
+            borderRadius: 9999,
+            borderWidth: 1.5,
+            borderColor: '#B5502F',
+            backgroundColor: '#FFF8F6',
+          }}
+        >
+          <FileDown size={14} color="#B5502F" strokeWidth={2} />
+          <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 13, color: '#B5502F' }}>Download Store Catalog (PDF)</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       {/* Product list */}

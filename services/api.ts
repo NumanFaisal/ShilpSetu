@@ -15,7 +15,7 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
-import { Platform } from 'react-native';
+import { Platform, Linking } from 'react-native';
 import { apiClient, ApiError, AUTH_TOKEN_KEY } from './apiClient';
 
 export { apiClient, ApiError };
@@ -984,8 +984,87 @@ export const generateCatalog = async (
     titleHi: generated.titleHi,
     descriptionEn: generated.descriptionEn || generated.aiDescription,
     descriptionHi: generated.descriptionHi,
+    heritageStory: generated.heritageStory,
+    heritageStoryHi: generated.heritageStoryHi,
+    craftProcess: generated.craftProcess,
+    craftProcessHi: generated.craftProcessHi,
+    dimensions: generated.dimensions,
+    weight: generated.weight,
+    primaryColors: generated.primaryColors,
+    originRegion: generated.originRegion,
+    highlights: generated.highlights,
+    usageAndStyling: generated.usageAndStyling,
+    careInstructions: generated.careInstructions,
+    careInstructionsHi: generated.careInstructionsHi,
+    sustainabilityNotes: generated.sustainabilityNotes,
+    estimatedProductionHours: generated.estimatedProductionHours,
+    tags: generated.tags || PRODUCT.tags,
+    keywords: generated.keywords || generated.tags,
     images: draft.images?.length ? draft.images : PRODUCT.images,
   };
+};
+
+/** Downloads a PDF catalog directly from live draft data (e.g. from Review screen) */
+export const downloadDraftCatalogPdf = async (draftData: any, filename?: string): Promise<void> => {
+  const safeName = (filename || draftData.name || 'product-catalog')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '-')
+    .slice(0, 35);
+
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    const res = await fetch(getApiUrl('/api/catalog/preview-pdf'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(draftData),
+    });
+    if (!res.ok) throw new Error('Failed to generate catalog PDF.');
+    const blob = await res.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `${safeName}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(blobUrl);
+    return;
+  }
+
+  // Mobile fallback: open preview URL
+  const url = getApiUrl('/api/catalog/preview-pdf');
+  await Linking.openURL(url);
+};
+
+/** Downloads a single product PDF catalog flyer */
+export const downloadProductCatalogPdf = async (productId: number, filename?: string): Promise<void> => {
+  const url = getApiUrl(`/api/catalog/${productId}/pdf`);
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename || `product-catalog-${productId}`}.pdf`;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } else {
+    await Linking.openURL(url);
+  }
+};
+
+/** Downloads the full artisan store catalog PDF */
+export const downloadArtisanCatalogPdf = async (artisanId: number, filename?: string): Promise<void> => {
+  const url = getApiUrl(`/api/catalog/${artisanId}/pdf`);
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename || `artisan-catalog-${artisanId}`}.pdf`;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } else {
+    await Linking.openURL(url);
+  }
 };
 
 /** Real Dynamic ML Pricing Assistant */
@@ -1395,6 +1474,9 @@ export const catalogApi = {
     apiRequest<ProductCatalog>(`/api/catalog/${id}/save`, { method: 'POST', body: JSON.stringify(c) }),
   getCatalog: (id: number) => apiRequest<ProductCatalog>(`/api/catalog/${id}`, {}, true),
   getPdfDownloadUrl: (id: number) => getApiUrl(`/api/catalog/${id}/pdf`),
+  downloadDraftCatalogPdf,
+  downloadProductCatalogPdf,
+  downloadArtisanCatalogPdf,
 };
 
 export const pricingApi = {

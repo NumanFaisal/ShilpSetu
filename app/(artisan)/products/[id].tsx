@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Share2, Archive, MessageCircle, ChevronRight } from 'lucide-react-native';
+import { Share2, Archive, MessageCircle, ChevronRight, FileDown } from 'lucide-react-native';
 import { Header } from '../../../components/ui/Header';
 import { AIBadge } from '../../../components/ui/AIBadge';
 import { Button } from '../../../components/ui/Button';
-import { getProductById, deleteProduct } from '../../../services/api';
+import { getProductById, deleteProduct, downloadProductCatalogPdf } from '../../../services/api';
 import { PRODUCT, BUYER_REQUEST } from '../../../mocks/seed';
 
 export default function ArtisanProductDetailsScreen() {
@@ -162,11 +162,32 @@ export default function ArtisanProductDetailsScreen() {
               </View>
             </TouchableOpacity>
           </View>
+          {/* Printable PDF Catalog Card */}
+          <View style={{ backgroundColor: '#FFFDF8', borderRadius: 12, borderWidth: 1.5, borderColor: '#B5502F', padding: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ gap: 2, flex: 1, paddingRight: 10 }}>
+              <Text style={{ fontFamily: 'Fraunces_600SemiBold', fontSize: 15, color: '#2B2420' }}>Printable PDF Catalog</Text>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: '#8A726B' }}>High-detail verified catalog flyer for wholesale & retail buyers</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => downloadProductCatalogPdf(Number(id), product.name)}
+              style={{ backgroundColor: '#B5502F', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            >
+              <FileDown size={15} color="#FFFFFF" strokeWidth={2} />
+              <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 12, color: '#FFFFFF' }}>Download</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
 
       {/* Bottom actions */}
       <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFFDF8', borderTopWidth: 1, borderTopColor: '#E4D8C3', paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', gap: 10 }}>
+        <TouchableOpacity
+          onPress={() => downloadProductCatalogPdf(Number(id), product.name)}
+          accessibilityLabel="Download product PDF catalog"
+          style={{ width: 44, height: 44, borderRadius: 8, borderWidth: 1, borderColor: '#B5502F', backgroundColor: '#FFF8F6', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <FileDown size={20} color="#B5502F" strokeWidth={1.8} />
+        </TouchableOpacity>
         <TouchableOpacity style={{ width: 44, height: 44, borderRadius: 8, borderWidth: 1, borderColor: '#E4D8C3', alignItems: 'center', justifyContent: 'center' }}>
           <Share2 size={20} color="#2B2420" strokeWidth={1.5} />
         </TouchableOpacity>
