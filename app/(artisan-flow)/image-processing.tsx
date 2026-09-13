@@ -11,9 +11,9 @@ import { processImages, imageStudioApi, StudioStyle } from '../../services/api';
 import { useAppStore } from '../../store/useAppStore';
 
 const PROCESSING_STEPS = [
-  'Inspecting craft object with Vision AI (material, form & weave)',
   'Removing background with Poof.bg AI precision',
-  'Generating contextual AI background tailored to your craft',
+  'Inspecting craft object with Gemini API (material, form & weave)',
+  'Generating product-related background tailored to your craft',
   'Sharpening handmade textures & enhancing authentic fibers',
   'Harmonizing realistic contact shadows & ambient lighting',
 ];
@@ -21,8 +21,8 @@ const PROCESSING_STEPS = [
 const DEFAULT_STYLES: StudioStyle[] = [
   {
     id: 'smart_contextual',
-    name: '✨ Smart AI Craft Studio (Recommended)',
-    description: 'Auto-detects your craft (pottery, brass, handloom, wood, jewelry) and renders an authentic matching backdrop.',
+    name: '✨ Gemini Smart Craft Studio (Auto Product Background)',
+    description: 'Gemini AI detects your craft (pottery, brass, handloom, wood, jewelry) and renders an authentic matching backdrop.',
     previewColor: '#C26D43',
   },
   {

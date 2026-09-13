@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, Easing } from 'react-native';
+import { View, Text, Animated, Easing, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Button } from '../../components/ui/Button';
-import { publishProduct } from '../../services/api';
+import { publishProduct, downloadProductCatalogPdf, downloadDraftCatalogPdf } from '../../services/api';
 import { useAppStore } from '../../store/useAppStore';
 
 export default function PublishSuccessScreen() {
@@ -73,6 +73,35 @@ export default function PublishSuccessScreen() {
         )}
 
         <View style={{ width: '100%', gap: 10 }}>
+          <TouchableOpacity
+            onPress={async () => {
+              try {
+                if ((draftProduct as any)?.id && typeof (draftProduct as any)?.id === 'number') {
+                  await downloadProductCatalogPdf((draftProduct as any).id, draftProduct.name);
+                } else {
+                  await downloadDraftCatalogPdf(draftProduct, draftProduct.name);
+                }
+              } catch (e: any) {
+                // Ignore or handled
+              }
+            }}
+            style={{
+              height: 48,
+              borderRadius: 8,
+              borderWidth: 1.5,
+              borderColor: '#B5502F',
+              backgroundColor: '#FFF8F6',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+          >
+            <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 14, color: '#B5502F' }}>
+              📄 Download Printable PDF Catalog
+            </Text>
+          </TouchableOpacity>
+
           <Button label="View My Products" onPress={() => { clearDraftProduct(); router.replace('/(artisan)/products'); }} />
           <Button label="Add Another Product" onPress={() => { clearDraftProduct(); router.replace('/(artisan-flow)/add-product'); }} variant="secondary" />
           <Button label="Back to Home" onPress={() => { clearDraftProduct(); router.replace('/(artisan)/home'); }} variant="ghost" />
