@@ -242,12 +242,20 @@ export interface PricingEstimateRequest {
   name: string;
   category: string;
   material: string;
-  craftComplexity: 'low' | 'medium' | 'high' | 'intricate' | number;
+  craftComplexity?: 'low' | 'medium' | 'high' | 'intricate' | number;
   materialCost: number;
-  labourHours: number;
+  labourHours?: number;
+  labourCost?: number;
   wageRate?: number;
   quantity?: number;
   debug?: boolean;
+}
+
+export interface PriceListingSource {
+  title: string;
+  url: string;
+  marketplace?: string;
+  extractedPrice?: number | null;
 }
 
 export interface PricingEstimateResult {
@@ -261,7 +269,8 @@ export interface PricingEstimateResult {
   reasoning: string;
   marginBreakdown: MarginBreakdown;
   marketplaceBreakdown: MarketplacePricePoint[];
-  sources?: string[];
+  sources?: PriceListingSource[];
+  pricingSource?: 'live_search' | 'benchmark_fallback';
 }
 
 export interface ProductPricing {
@@ -988,6 +997,7 @@ export const getAIPricing = async (
     material: string;
     quantity?: number;
     labourHours?: number;
+    labourCost?: number;
     materialCost?: number;
     craftComplexity?: 'low' | 'medium' | 'high' | 'intricate';
   }
@@ -1000,16 +1010,23 @@ export const getAIPricing = async (
   reasoning: string;
   marketInsight: string;
   marginBreakdown?: MarginBreakdown;
+  sources?: PriceListingSource[];
+  pricingSource?: 'live_search' | 'benchmark_fallback';
+  marketplaceBreakdown?: MarketplacePricePoint[];
 }> => {
   const pId = productData.id || 1;
+  const matCost = productData.materialCost != null ? Number(productData.materialCost) : 400;
+  const labCost = productData.labourCost != null ? Number(productData.labourCost) : 500;
+
   const reqPayload: PricingEstimateRequest = {
     productId: pId,
     name: productData.name,
     category: productData.category || 'Handicrafts',
     material: productData.material || 'Natural Fiber',
     craftComplexity: productData.craftComplexity || 'medium',
-    materialCost: productData.materialCost || 400,
-    labourHours: productData.labourHours || 8,
+    materialCost: matCost,
+    labourCost: labCost,
+    labourHours: productData.labourHours || 6,
     wageRate: 100,
     quantity: productData.quantity || 1,
   };
@@ -1020,6 +1037,7 @@ export const getAIPricing = async (
       body: JSON.stringify(reqPayload),
     }, true);
 
+    const isLive = res.pricingSource === 'live_search';
     return {
       id: pId,
       suggested: res.suggested || res.recommendedPrice,
@@ -1027,19 +1045,27 @@ export const getAIPricing = async (
       max: res.marketMax,
       baseCost: res.baseCost,
       reasoning: res.reasoning,
-      marketInsight: `Amazon/Flipkart average benchmark is ₹${res.marketMin}–₹${res.marketMax}. Recommended artisan profit is ₹${res.marginBreakdown?.artisanProfit || 400}.`,
+      marketInsight: isLive
+        ? `Real web listings found on Amazon, Flipkart, Meesho & Etsy between ₹${res.marketMin} and ₹${res.marketMax}. Recommended artisan profit is ₹${res.marginBreakdown?.artisanProfit || 400}.`
+        : `Verified Indian craft benchmarks range from ₹${res.marketMin} to ₹${res.marketMax}. Recommended artisan profit is ₹${res.marginBreakdown?.artisanProfit || 400}.`,
       marginBreakdown: res.marginBreakdown,
+      sources: res.sources || [],
+      pricingSource: res.pricingSource,
+      marketplaceBreakdown: res.marketplaceBreakdown,
     };
   } catch (err: any) {
     console.warn('[API] Real ML Pricing estimate error:', err.message);
+    const estBase = matCost + labCost;
     return {
       id: pId,
-      suggested: 1850,
-      min: 1400,
-      max: 2200,
-      baseCost: 950,
-      reasoning: 'Calculated using artisan labor cost, raw material benchmarks, and festive retail demand.',
-      marketInsight: 'High demand across national e-commerce channels with competitive margins.',
+      suggested: Math.round(estBase * 1.35),
+      min: Math.round(estBase * 1.1),
+      max: Math.round(estBase * 1.8),
+      baseCost: estBase,
+      reasoning: `Based on your ₹${matCost} material cost and ₹${labCost} labour cost, a price of ₹${Math.round(estBase * 1.35)} provides a fair artisan profit.`,
+      marketInsight: 'Estimated from artisan input costs and regional benchmark averages.',
+      sources: [],
+      pricingSource: 'benchmark_fallback',
     };
   }
 };

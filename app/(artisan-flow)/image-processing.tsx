@@ -11,11 +11,11 @@ import { processImages, imageStudioApi, StudioStyle } from '../../services/api';
 import { useAppStore } from '../../store/useAppStore';
 
 const PROCESSING_STEPS = [
-  'Identifying craft type, materials & authenticity',
-  'Removing background with AI edge precision',
-  'Generating contextual studio backdrop matching your craft',
-  'Sharpening handmade textures & enhancing vibrant colors',
-  'Applying realistic contact shadow & commercial lighting',
+  'Inspecting craft object with Vision AI (material, form & weave)',
+  'Removing background with Poof.bg AI precision',
+  'Generating contextual AI background tailored to your craft',
+  'Sharpening handmade textures & enhancing authentic fibers',
+  'Harmonizing realistic contact shadows & ambient lighting',
 ];
 
 const DEFAULT_STYLES: StudioStyle[] = [
