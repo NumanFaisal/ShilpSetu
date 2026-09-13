@@ -1,9 +1,11 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
+export type AIBadgeVariant = 'suggested' | 'insight' | 'match' | 'default' | 'warning' | string;
+
 interface AIBadgeProps {
   label?: string;
-  variant?: 'suggested' | 'insight' | 'match';
+  variant?: AIBadgeVariant;
 }
 
 /**
@@ -15,8 +17,13 @@ export const AIBadge: React.FC<AIBadgeProps> = ({
   label = 'AI Suggested',
   variant = 'suggested',
 }) => {
-  const variantConfig = {
+  const variantConfig: Record<string, { borderColor: string; textColor: string; bgColor: string }> = {
     suggested: {
+      borderColor: '#5B6E4E',
+      textColor: '#5B6E4E',
+      bgColor: 'rgba(91,110,78,0.06)',
+    },
+    default: {
       borderColor: '#5B6E4E',
       textColor: '#5B6E4E',
       bgColor: 'rgba(91,110,78,0.06)',
@@ -31,9 +38,15 @@ export const AIBadge: React.FC<AIBadgeProps> = ({
       textColor: '#B5502F',
       bgColor: 'rgba(181,80,47,0.06)',
     },
+    warning: {
+      borderColor: '#C28338',
+      textColor: '#8C561E',
+      bgColor: 'rgba(194,131,56,0.08)',
+    },
   };
 
-  const config = variantConfig[variant];
+  // Safe fallback to prevent any undefined property access crashes
+  const config = (variant && variantConfig[variant]) ? variantConfig[variant] : variantConfig.suggested;
 
   return (
     <View

@@ -25,13 +25,20 @@ export default function PricingScreen() {
   const [price, setPrice] = useState('1450');
 
   const rawImage = draftProduct.images?.[0] || PRODUCT.images?.[0];
-  const productImage = typeof rawImage === 'string' ? rawImage : (rawImage as any)?.uri || (rawImage as any)?.url || '';
-  const productName = draftProduct.name || PRODUCT.name;
-  const productCategory = draftProduct.category || PRODUCT.category;
-  const productMaterial = draftProduct.material || PRODUCT.material;
+  const rawImageStr = typeof rawImage === 'string' ? rawImage.trim() : (rawImage as any)?.uri || (rawImage as any)?.url || '';
+  const productImage = typeof rawImageStr === 'string' ? rawImageStr : '';
+  const productName = typeof draftProduct.name === 'string' && draftProduct.name.trim().length > 0 
+    ? draftProduct.name 
+    : ((draftProduct.name as any)?.en || PRODUCT.name || 'Handmade Craft');
+  const productCategory = typeof draftProduct.category === 'string' && draftProduct.category.trim().length > 0 
+    ? draftProduct.category 
+    : (PRODUCT.category || 'Handicraft');
+  const productMaterial = typeof draftProduct.material === 'string' && draftProduct.material.trim().length > 0 
+    ? draftProduct.material 
+    : (PRODUCT.material || '');
 
-  const numericMaterial = parseInt(materialCost) || 0;
-  const numericLabour = parseInt(labourCost) || 0;
+  const numericMaterial = parseInt(materialCost, 10) || 0;
+  const numericLabour = parseInt(labourCost, 10) || 0;
   const totalBaseCost = numericMaterial + numericLabour;
 
   // Search internet for real product prices
@@ -47,9 +54,11 @@ export default function PricingScreen() {
         labourCost: numericLabour,
         quantity: draftProduct.quantity || 1,
       });
-      setAiPricing(result);
-      if (result.suggested) {
-        setPrice(String(result.suggested));
+      if (result) {
+        setAiPricing(result);
+        if (result.suggested) {
+          setPrice(String(result.suggested));
+        }
       }
     } catch (err: any) {
       console.warn('[Pricing] Market search error:', err?.message);
@@ -67,7 +76,7 @@ export default function PricingScreen() {
 
   const handlePublish = async () => {
     setPublishing(true);
-    const numericPrice = parseInt(price) || totalBaseCost || 1450;
+    const numericPrice = parseInt(price, 10) || totalBaseCost || 1450;
     updateDraftProduct({ price: numericPrice });
 
     try {
@@ -89,6 +98,14 @@ export default function PricingScreen() {
     }
   };
 
+  const isImageValid = Boolean(productImage) && (
+    productImage.startsWith('http://') ||
+    productImage.startsWith('https://') ||
+    productImage.startsWith('file:') ||
+    productImage.startsWith('data:') ||
+    productImage.startsWith('/')
+  );
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF8F6' }}>
       <Header title="Cost & Market Pricing" showBack />
@@ -97,7 +114,7 @@ export default function PricingScreen() {
 
           {/* Product Summary Preview Card */}
           <View style={{ backgroundColor: '#FFFFFF', borderRadius: 12, borderWidth: 1, borderColor: '#E8DED8', padding: 12, flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-            {productImage ? (
+            {isImageValid ? (
               <Image source={{ uri: productImage }} style={{ width: 68, height: 68, borderRadius: 8, backgroundColor: '#F6EEDF' }} resizeMode="cover" />
             ) : (
               <View style={{ width: 68, height: 68, borderRadius: 8, backgroundColor: '#F6EEDF', alignItems: 'center', justifyContent: 'center' }}>
@@ -112,7 +129,7 @@ export default function PricingScreen() {
                 <View style={{ backgroundColor: '#F6EEDF', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
                   <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 11, color: '#56423C' }}>{productCategory}</Text>
                 </View>
-                {productMaterial && (
+                {Boolean(productMaterial) && (
                   <View style={{ backgroundColor: '#F0EBE5', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
                     <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 11, color: '#6B5952' }}>{productMaterial}</Text>
                   </View>
@@ -264,7 +281,7 @@ export default function PricingScreen() {
                   </View>
                   <AIBadge
                     label={aiPricing.pricingSource === 'live_search' ? 'Real Web Data' : 'Benchmark Data'}
-                    variant={aiPricing.pricingSource === 'live_search' ? 'default' : 'warning'}
+                    variant={aiPricing.pricingSource === 'live_search' ? 'insight' : 'suggested'}
                   />
                 </View>
 
@@ -276,7 +293,7 @@ export default function PricingScreen() {
                       Real Min Cost
                     </Text>
                     <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: '#2B2420' }}>
-                      ₹{aiPricing.min}
+                      ₹{aiPricing.min ?? 0}
                     </Text>
                     <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 10, color: '#8A726B', textAlign: 'center' }}>
                       Lowest found online
@@ -289,7 +306,7 @@ export default function PricingScreen() {
                       Fair Retail
                     </Text>
                     <Text style={{ fontFamily: 'Inter_800Bold', fontSize: 22, color: '#B5502F' }}>
-                      ₹{aiPricing.suggested}
+                      ₹{aiPricing.suggested ?? 0}
                     </Text>
                     <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 10, color: '#5B6E4E', textAlign: 'center' }}>
                       Fair Artisan Profit
@@ -302,7 +319,7 @@ export default function PricingScreen() {
                       Real Max Cost
                     </Text>
                     <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 18, color: '#2B2420' }}>
-                      ₹{aiPricing.max}
+                      ₹{aiPricing.max ?? 0}
                     </Text>
                     <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 10, color: '#8A726B', textAlign: 'center' }}>
                       Highest found online
@@ -311,7 +328,7 @@ export default function PricingScreen() {
                 </View>
 
                 {/* Real Web Listings Discovered (Real Not AI Generated) */}
-                {aiPricing.sources && aiPricing.sources.length > 0 && (
+                {Array.isArray(aiPricing.sources) && aiPricing.sources.length > 0 && (
                   <View style={{ gap: 8 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 13, color: '#2B2420' }}>
@@ -323,40 +340,43 @@ export default function PricingScreen() {
                     </View>
 
                     <View style={{ gap: 6 }}>
-                      {aiPricing.sources.slice(0, 4).map((src: PriceListingSource, idx: number) => (
-                        <View
-                          key={idx}
-                          style={{
-                            backgroundColor: '#FFFFFF',
-                            borderRadius: 8,
-                            borderWidth: 1,
-                            borderColor: '#E8DED8',
-                            padding: 10,
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            gap: 8,
-                          }}
-                        >
-                          <View style={{ flex: 1, gap: 2 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                              <View style={{ backgroundColor: '#FDF2EE', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-                                <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 10, color: '#B5502F' }}>
-                                  {src.marketplace || 'Online'}
+                      {aiPricing.sources.slice(0, 4).map((src: PriceListingSource, idx: number) => {
+                        if (!src) return null;
+                        return (
+                          <View
+                            key={idx}
+                            style={{
+                              backgroundColor: '#FFFFFF',
+                              borderRadius: 8,
+                              borderWidth: 1,
+                              borderColor: '#E8DED8',
+                              padding: 10,
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              gap: 8,
+                            }}
+                          >
+                            <View style={{ flex: 1, gap: 2 }}>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                                <View style={{ backgroundColor: '#FDF2EE', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                                  <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 10, color: '#B5502F' }}>
+                                    {src.marketplace || 'Online'}
+                                  </Text>
+                                </View>
+                                <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: '#2B2420' }} numberOfLines={1}>
+                                  {src.title || 'Market Item'}
                                 </Text>
                               </View>
-                              <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: '#2B2420' }} numberOfLines={1}>
-                                {src.title}
-                              </Text>
                             </View>
+                            {src.extractedPrice != null && (
+                              <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 14, color: '#2B2420' }}>
+                                ₹{src.extractedPrice}
+                              </Text>
+                            )}
                           </View>
-                          {src.extractedPrice != null && (
-                            <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 14, color: '#2B2420' }}>
-                              ₹{src.extractedPrice}
-                            </Text>
-                          )}
-                        </View>
-                      ))}
+                        );
+                      })}
                     </View>
                   </View>
                 )}
@@ -380,7 +400,7 @@ export default function PricingScreen() {
                       <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 14, color: '#5B6E4E' }}>Your Net Profit Margin</Text>
                     </View>
                     <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 15, color: '#5B6E4E' }}>
-                      +₹{Math.max(0, (parseInt(price) || aiPricing.suggested) - totalBaseCost)}
+                      +₹{Math.max(0, (parseInt(price, 10) || Number(aiPricing.suggested) || 0) - totalBaseCost)}
                     </Text>
                   </View>
                 </View>
